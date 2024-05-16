@@ -748,7 +748,7 @@ int vc_scale_gray_to_rgb(IVC *src, IVC *dst)
 	return 1;
 }
 
-void combine_segmentations(IVC *dst, IVC *src1, IVC *src2)
+/* void combine_segmentations(IVC *dst, IVC *src1, IVC *src2)
 {
 	if (src1->width != src2->width || src1->height != src2->height)
 	{
@@ -773,7 +773,7 @@ void combine_segmentations(IVC *dst, IVC *src1, IVC *src2)
 			}
 		}
 	}
-}
+} */
 
 int vc_white_pixels_quantitie(IVC *srcdst)
 {
@@ -2080,6 +2080,29 @@ int vc_brg_to_gray(IVC *srcdst) {
             data[pos] = gray;      // B channel
             data[pos + 1] = gray;  // G channel
             data[pos + 2] = gray;  // R channel
+        }
+    }
+    return 1;
+}
+
+int vc_bgr_to_rgb(IVC *srcdst) {
+    if (srcdst == NULL) return 0;
+    if (srcdst->channels != 3) return 0;
+
+    unsigned char temp;
+    int width = srcdst->width;
+    int height = srcdst->height;
+    int bytesperline = srcdst->bytesperline;
+    int channels = srcdst->channels;
+    unsigned char *data = srcdst->data;
+
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            int pos = y * bytesperline + x * channels;
+
+            temp = data[pos];
+            data[pos] = data[pos + 2];
+            data[pos + 2] = temp;
         }
     }
     return 1;

@@ -103,37 +103,33 @@ int main(void) {
 		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
 		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
 
+		
+		// Source Image 
+		IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
+		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
 
-		// Fa�a o seu c�digo aqui...
-		/*
-		// Cria uma nova imagem IVC
-		IVC *image = vc_image_new(video.width, video.height, 3, 255);
-		// Copia dados de imagem da estrutura cv::Mat para uma estrutura IVC
-		memcpy(image->data, frame.data, video.width * video.height * 3);
-		// Executa uma fun��o da nossa biblioteca vc
-		vc_rgb_get_green(image);
-		// Copia dados de imagem da estrutura IVC para uma estrutura cv::Mat
-		memcpy(frame.data, image->data, video.width * video.height * 3);
-		// Liberta a mem�ria da imagem IVC que havia sido criada
-		vc_image_free(image);
-		*/
-		// +++++++++++++++++++++++++
+		// Destination Image
+		IVC *dstimage = vc_image_new(video.width, video.height, 3, 255);
+
+		/*----------------PROCESS DEVELOPMENT-------------------------*/
+		/*Initial video Time: 28 SECONDS*/
+
+		vc_bgr_to_rgb(srcimage);
+		vc_rgb_to_hsv(srcimage);
+		//vc_gray_to_binary(imagesrc, 9);
+
+		// HSV SEGMENTATION 
+		int hmin = 0, hmax = 180; 
+		int smin = 0, smax = 255;
+		int vmin = 0, vmax = 255;
+		vc_hsv_segmentation(srcimage, dstimage, hmin, hmax, smin, smax, vmin, vmax);
+		/*Actual video Time: 37 SECONDS*/
 		
-		IVC *image = vc_image_new(video.width, video.height, 3, 255);
-		
-		memcpy(image->data, frame.data, video.width * video.height * 3);
-		
-		
-		
-		
-		vc_brg_to_gray(image);
-		
-		
-		
-		memcpy(frame.data, image->data, video.width * video.height * 3);
-		
-		
-		vc_image_free(image);
+		/*-----------------------------------------------------------*/
+	
+		memcpy(frame.data, srcimage->data, video.width * video.height * 3);
+			
+		vc_image_free(srcimage);
 		
 
 		/* Exibe a frame */

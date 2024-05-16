@@ -101,4 +101,10 @@ int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th);
 
 int vc_brg_to_gray(IVC *srcdst);
 
+int vc_bgr_to_rgb(IVC *srcdst);
+
+void segment_resistors(IVC *image);
+
+
+
 

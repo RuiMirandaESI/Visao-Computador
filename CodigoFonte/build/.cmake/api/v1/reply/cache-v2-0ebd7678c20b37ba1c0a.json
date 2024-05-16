@@ -27,7 +27,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build"
+			"value" : "c:/Program Files (x86)/VisaoComputador_TP/CodigoFonte/build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -431,7 +431,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build/CMakeFiles/pkgRedirects"
+			"value" : "C:/Program Files (x86)/VisaoComputador_TP/CodigoFonte/build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -491,7 +491,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte"
+			"value" : "C:/Program Files (x86)/VisaoComputador_TP/CodigoFonte"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -1027,7 +1027,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build"
+			"value" : "C:/Program Files (x86)/VisaoComputador_TP/CodigoFonte/build"
 		},
 		{
 			"name" : "CodigoFonte_IS_TOP_LEVEL",
@@ -1051,7 +1051,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte"
+			"value" : "C:/Program Files (x86)/VisaoComputador_TP/CodigoFonte"
 		},
 		{
 			"name" : "FIND_PACKAGE_MESSAGE_DETAILS_OpenCV",
