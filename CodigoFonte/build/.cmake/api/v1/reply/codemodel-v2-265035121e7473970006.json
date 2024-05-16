@@ -57,7 +57,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ZERO_CHECK-Debug-bba61c74275d41ac7aa9.json",
+					"jsonFile" : "target-ZERO_CHECK-Debug-3252bb58246ec109ebb4.json",
 					"name" : "ZERO_CHECK",
 					"projectIndex" : 0
 				}
@@ -119,7 +119,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ZERO_CHECK-Release-bba61c74275d41ac7aa9.json",
+					"jsonFile" : "target-ZERO_CHECK-Release-3252bb58246ec109ebb4.json",
 					"name" : "ZERO_CHECK",
 					"projectIndex" : 0
 				}
@@ -181,7 +181,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ZERO_CHECK-MinSizeRel-bba61c74275d41ac7aa9.json",
+					"jsonFile" : "target-ZERO_CHECK-MinSizeRel-3252bb58246ec109ebb4.json",
 					"name" : "ZERO_CHECK",
 					"projectIndex" : 0
 				}
@@ -243,7 +243,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ZERO_CHECK::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ZERO_CHECK-RelWithDebInfo-bba61c74275d41ac7aa9.json",
+					"jsonFile" : "target-ZERO_CHECK-RelWithDebInfo-3252bb58246ec109ebb4.json",
 					"name" : "ZERO_CHECK",
 					"projectIndex" : 0
 				}
@@ -253,8 +253,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Program Files (x86)/CodigoFonte/build",
-		"source" : "C:/Program Files (x86)/CodigoFonte"
+		"build" : "C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build",
+		"source" : "C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte"
 	},
 	"version" : 
 	{

@@ -2048,3 +2048,39 @@ int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th) // th = [0.001, 1.000]
 
 	return 1;
 }
+
+int vc_brg_to_gray(IVC *srcdst) {
+    unsigned char *data = (unsigned char *)srcdst->data;
+    int bytesperline = srcdst->width * srcdst->channels;
+    int channels = srcdst->channels;
+    int width = srcdst->width;
+    int height = srcdst->height;
+    int x, y;
+    long int pos;
+    float rf, gf, bf;
+
+    if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
+        return 0;
+    if (srcdst->channels != 3)
+        return 0;
+
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+            pos = y * bytesperline + x * channels;
+
+            // Adjusted for BGR format
+            bf = (float)data[pos];
+            gf = (float)data[pos + 1];
+            rf = (float)data[pos + 2];
+
+            // Calculate grayscale value using the luminosity method
+            unsigned char gray = (unsigned char)((bf * 0.114) + (gf * 0.587) + (rf * 0.299));
+
+            // Update the BGR image in place to grayscale (all channels the same)
+            data[pos] = gray;      // B channel
+            data[pos + 1] = gray;  // G channel
+            data[pos + 2] = gray;  // R channel
+        }
+    }
+    return 1;
+}

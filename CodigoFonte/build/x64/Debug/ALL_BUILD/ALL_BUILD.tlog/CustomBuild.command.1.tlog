@@ -1,6 +1,6 @@
-^C:\PROGRAM FILES (X86)\CODIGOFONTE\CMAKELISTS.TXT
+^C:\USERS\123RU\ONEDRIVE\AMBIENTE DE TRABALHO\VISAOCOMPUTADOR_TP\CODIGOFONTE\CMAKELISTS.TXT
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Program Files (x86)/CodigoFonte" "-BC:/Program Files (x86)/CodigoFonte/build" --check-stamp-file "C:/Program Files (x86)/CodigoFonte/build/CMakeFiles/generate.stamp"
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte" "-BC:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build" --check-stamp-file "C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build/CMakeFiles/generate.stamp"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

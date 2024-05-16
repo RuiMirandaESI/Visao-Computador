@@ -120,20 +120,21 @@ int main(void) {
 		// +++++++++++++++++++++++++
 		
 		IVC *image = vc_image_new(video.width, video.height, 3, 255);
-		IVC *image2 = vc_image_new(video.width, video.height, 3, 255);
+		
 		memcpy(image->data, frame.data, video.width * video.height * 3);
 		
 		
 		
-		vc_rgb_to_gray(image, image2);
+		
+		vc_brg_to_gray(image);
+		
 		
 		
 		memcpy(frame.data, image->data, video.width * video.height * 3);
 		
 		
 		vc_image_free(image);
-		vc_image_free(image2);
-
+		
 
 		/* Exibe a frame */
 		cv::imshow("VC - VIDEO", frame);

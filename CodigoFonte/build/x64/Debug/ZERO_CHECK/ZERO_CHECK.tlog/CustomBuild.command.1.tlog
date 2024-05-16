@@ -1,6 +1,6 @@
-^C:\PROGRAM FILES (X86)\CODIGOFONTE\BUILD\CMAKEFILES\904E0A0DFA2B7A039F8F1CD72C23437A\GENERATE.STAMP.RULE
+^C:\USERS\123RU\ONEDRIVE\AMBIENTE DE TRABALHO\VISAOCOMPUTADOR_TP\CODIGOFONTE\BUILD\CMAKEFILES\CFCD67D2E09A84BAACA8DB028ECE74A2\GENERATE.STAMP.RULE
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Program Files (x86)/CodigoFonte" "-BC:/Program Files (x86)/CodigoFonte/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Program Files (x86)/CodigoFonte/build/CodigoFonte.sln"
+"C:\Program Files\CMake\bin\cmake.exe" "-SC:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte" "-BC:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build" --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file "C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build/CodigoFonte.sln"
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone

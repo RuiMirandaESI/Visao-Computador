@@ -99,4 +99,6 @@ int vc_gray_histogram_equalization(IVC *src, IVC *dst);
 
 int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th);
 
+int vc_brg_to_gray(IVC *srcdst);
+
 

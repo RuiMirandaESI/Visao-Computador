@@ -1,9 +1,4 @@
 # CMake generation dependency list for this directory.
-C:/Program Files (x86)/CodigoFonte/CMakeLists.txt
-C:/Program Files (x86)/CodigoFonte/build/CMakeFiles/3.29.3/CMakeCCompiler.cmake
-C:/Program Files (x86)/CodigoFonte/build/CMakeFiles/3.29.3/CMakeCXXCompiler.cmake
-C:/Program Files (x86)/CodigoFonte/build/CMakeFiles/3.29.3/CMakeRCCompiler.cmake
-C:/Program Files (x86)/CodigoFonte/build/CMakeFiles/3.29.3/CMakeSystem.cmake
 C:/Program Files/CMake/share/cmake-3.29/Modules/CMakeCInformation.cmake
 C:/Program Files/CMake/share/cmake-3.29/Modules/CMakeCXXInformation.cmake
 C:/Program Files/CMake/share/cmake-3.29/Modules/CMakeCommonLanguageInclude.cmake
@@ -25,6 +20,11 @@ C:/Program Files/CMake/share/cmake-3.29/Modules/Platform/Windows-MSVC-CXX.cmake
 C:/Program Files/CMake/share/cmake-3.29/Modules/Platform/Windows-MSVC.cmake
 C:/Program Files/CMake/share/cmake-3.29/Modules/Platform/Windows.cmake
 C:/Program Files/CMake/share/cmake-3.29/Modules/Platform/WindowsPaths.cmake
+C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/CMakeLists.txt
+C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build/CMakeFiles/3.29.3/CMakeCCompiler.cmake
+C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build/CMakeFiles/3.29.3/CMakeCXXCompiler.cmake
+C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build/CMakeFiles/3.29.3/CMakeRCCompiler.cmake
+C:/Users/123ru/OneDrive/Ambiente de Trabalho/VisaoComputador_TP/CodigoFonte/build/CMakeFiles/3.29.3/CMakeSystem.cmake
 C:/opencv/build/x64/vc16/lib/OpenCVConfig-version.cmake
 C:/opencv/build/x64/vc16/lib/OpenCVConfig.cmake
 C:/opencv/build/x64/vc16/lib/OpenCVModules-debug.cmake
