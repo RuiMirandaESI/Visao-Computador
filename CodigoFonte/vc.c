@@ -212,9 +212,9 @@ IVC *vc_read_image(char *filename)
 			levels = 1;
 		} // Se PBM (Binary [0,1])
 		else if (strcmp(tok, "P5") == 0)
-			channels = 1; // Se PGM (Gray [0,MAX(level,255)])
+			channels = 1; // Se PGM (Gray [0,MY_MAX(level,255)])
 		else if (strcmp(tok, "P6") == 0)
-			channels = 3; // Se PPM (RGB [0,MAX(level,255)])
+			channels = 3; // Se PPM (RGB [0,MY_MAX(level,255)])
 		else
 		{
 #ifdef VC_DEBUG
@@ -1679,8 +1679,8 @@ int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs)
 		// Centro de Gravidade
 		// blobs[i].xc = (xmax - xmin) / 2;
 		// blobs[i].yc = (ymax - ymin) / 2;
-		blobs[i].xc = sumx / MAX(blobs[i].area, 1);
-		blobs[i].yc = sumy / MAX(blobs[i].area, 1);
+		blobs[i].xc = sumx / MY_MAX(blobs[i].area, 1);
+		blobs[i].yc = sumy / MY_MAX(blobs[i].area, 1);
 	}
 
 	return 1;
@@ -1747,10 +1747,10 @@ int vc_draw_boundingbox(IVC *srcdst, OVC *blobs, int nblobs)
 		int ymax = ymin + blobs[i].height;
 
 		// Ensure the bounding box is within the image boundaries
-		xmin = MAX(0, xmin);
-		ymin = MAX(0, ymin);
-		xmax = MIN(width - 1, xmax);
-		ymax = MIN(height - 1, ymax);
+		xmin = MY_MAX(0, xmin);
+		ymin = MY_MAX(0, ymin);
+		xmax = MY_MIN(width - 1, xmax);
+		ymax = MY_MIN(height - 1, ymax);
 
 		// Draw horizontal lines at the top and bottom of the bounding box
 		for (x = xmin; x <= xmax; x++)
@@ -1805,7 +1805,7 @@ int vc_draw_centerofgravity(IVC *srcdst, OVC *blobs, int nblobs, int s)
 		xmax = xc + s;
 
 		// Draw vertical line of the cross
-		for (y = MAX(0, ymin); y <= MIN(ymax, height - 1); y++)
+		for (y = MY_MAX(0, ymin); y <= MY_MIN(ymax, height - 1); y++)
 		{
 			int pos = y * bytesperline + xc * channels;
 			if (xc >= 0 && xc < width)
@@ -1818,7 +1818,7 @@ int vc_draw_centerofgravity(IVC *srcdst, OVC *blobs, int nblobs, int s)
 		}
 
 		// Draw horizontal line of the cross
-		for (x = MAX(0, xmin); x <= MIN(xmax, width - 1); x++)
+		for (x = MY_MAX(0, xmin); x <= MY_MIN(xmax, width - 1); x++)
 		{
 			int pos = yc * bytesperline + x * channels;
 			if (yc >= 0 && yc < height)
