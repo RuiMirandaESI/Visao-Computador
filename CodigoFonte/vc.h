@@ -105,6 +105,9 @@ int vc_bgr_to_rgb(IVC *srcdst);
 
 void segment_resistors(IVC *image);
 
+int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
+int vc_bgr_to_hsv(IVC *srcdst);
+
 
 
 

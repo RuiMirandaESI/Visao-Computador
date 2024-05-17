@@ -106,30 +106,20 @@ int main(void) {
 		
 		// Source Image 
 		IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
+		
 		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
 
-		// Destination Image
-		IVC *dstimage = vc_image_new(video.width, video.height, 3, 255);
-
-		/*----------------PROCESS DEVELOPMENT-------------------------*/
-		/*Initial video Time: 28 SECONDS*/
-
-		vc_bgr_to_rgb(srcimage);
-		vc_rgb_to_hsv(srcimage);
-		//vc_gray_to_binary(imagesrc, 9);
-
-		// HSV SEGMENTATION 
-		int hmin = 0, hmax = 180; 
-		int smin = 0, smax = 255;
-		int vmin = 0, vmax = 255;
-		vc_hsv_segmentation(srcimage, dstimage, hmin, hmax, smin, smax, vmin, vmax);
-		/*Actual video Time: 37 SECONDS*/
 		
-		/*-----------------------------------------------------------*/
-	
+		vc_bgr_to_hsv(srcimage);
+		vc_hsv_segmentation2(srcimage, 0, 150, 30, 100, 30, 100);
+
+
 		memcpy(frame.data, srcimage->data, video.width * video.height * 3);
+
+		
 			
 		vc_image_free(srcimage);
+		
 		
 
 		/* Exibe a frame */

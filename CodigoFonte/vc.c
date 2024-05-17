@@ -2107,3 +2107,127 @@ int vc_bgr_to_rgb(IVC *srcdst) {
     }
     return 1;
 }
+
+int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, int vmin, int vmax)
+{
+    unsigned char *data = (unsigned char *)srcdst->data;
+    int bytesperline = srcdst->width * srcdst->channels;
+    int channels = srcdst->channels;
+    int width = srcdst->width;
+    int height = srcdst->height;
+    int x, y;
+    long int pos;
+    float h, s, v;
+
+    if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
+        return 0;
+    if (srcdst->channels != 3)
+        return 0;
+
+    // Segmentation loop
+    for (y = 0; y < height; y++)
+    {
+        for (x = 0; x < width; x++)
+        {
+            pos = y * bytesperline + x * channels;
+
+            // Assuming HSV values are stored in srcdst and are normalized [0, 255]
+            h = (int)(((float)data[pos]) / 255.0f * 360.0f);
+            s = (int)(((float)data[pos + 1]) / 255.0f * 100.0f);
+            v = (int)(((float)data[pos + 2]) / 255.0f * 100.0f);
+
+            // Check if the pixel falls within the specified HSV range
+            if (h >= hmin && h <= hmax && s >= smin && s <= smax && v >= vmin && v <= vmax)
+            {
+                data[pos] = 255;     // Set the pixel to white
+                data[pos + 1] = 255;
+                data[pos + 2] = 255;
+            }
+            else
+            {
+                data[pos] = 0;       // Set the pixel to black
+                data[pos + 1] = 0;
+                data[pos + 2] = 0;
+            }
+        }
+    }
+
+    return 1; // Success
+}
+
+int vc_bgr_to_hsv(IVC *srcdst)
+{
+    unsigned char *data = (unsigned char *)srcdst->data;
+    int width = srcdst->width;
+    int height = srcdst->height;
+    int bytesperline = srcdst->bytesperline;
+    int channels = srcdst->channels;
+    float r, g, b, saturation, hue, value;
+    int i, size;
+    int pos_src;
+    float rgb_max;
+    float rgb_min;
+
+    if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
+        return 0;
+    if (channels != 3)
+        return 0;
+
+    size = width * height * channels;
+
+    for (i = 0; i < size; i += channels)
+    {
+        pos_src = i;
+
+        b = (float)data[pos_src];
+        g = (float)data[pos_src + 1];
+        r = (float)data[pos_src + 2];
+
+        rgb_max = fmaxf(r, fmaxf(g, b));
+        rgb_min = fminf(r, fminf(g, b));
+
+        value = rgb_max;
+
+        if (value == 0.0f)
+        {
+            hue = 0.0f;
+            saturation = 0.0f;
+        }
+        else
+        {
+            saturation = ((rgb_max - rgb_min) / rgb_max) * 255.0f;
+
+            if (saturation == 0.0f)
+            {
+                hue = 0.0f;
+            }
+            else
+            {
+                if ((rgb_max == r) && (g >= b))
+                {
+                    hue = 60.0f * (g - b) / (rgb_max - rgb_min);
+                }
+                else if ((rgb_max == r) && (b > g))
+                {
+                    hue = 360.0f + 60.0f * (g - b) / (rgb_max - rgb_min);
+                }
+                else if (rgb_max == g)
+                {
+                    hue = 120.0f + 60.0f * (b - r) / (rgb_max - rgb_min);
+                }
+                else if (rgb_max == b)
+                {
+                    hue = 240.0f + 60.0f * (r - g) / (rgb_max - rgb_min);
+                }
+            }
+        }
+
+        data[i] = (unsigned char)(hue / 360.0f * 255.0f);
+        data[i + 1] = (unsigned char)(saturation);
+        data[i + 2] = (unsigned char)(value);
+    }
+
+    return 1;
+}
+
+
