@@ -110,8 +110,7 @@ int main(void) {
 		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
 
 		vc_bgr_to_gray(srcimage);
-		vc_gray_to_hsv(srcimage);
-		vc_hsv_segmentation2(srcimage, 100, 230, 45, 100, 0, 70);		
+		vc_hsv_segmentation2(srcimage, 20, 230, 20, 120, 40, 70);		
 		
 		memcpy(frame.data, srcimage->data, video.width * video.height * 3);
 		

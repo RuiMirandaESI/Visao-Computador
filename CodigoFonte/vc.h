@@ -68,8 +68,6 @@ int vc_white_pixels_quantitie(IVC *srcdst);
 
 int vc_gray_to_binary(IVC *srcdst, int threshold);
 
-int vc_gray_to_hsv(IVC *srcdst);
-
 int vc_gray_to_binary_global_mean(IVC *srcdst);
 
 int vc_gray_to_binary_midpoint(IVC *src, IVC *dst, int kernel);
