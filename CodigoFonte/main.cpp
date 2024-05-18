@@ -6,19 +6,22 @@
 #include <opencv2\highgui.hpp>
 #include <opencv2\videoio.hpp>
 
-extern "C" {
+extern "C"
+{
 #include "vc.h"
 }
 
-
-void vc_timer(void) {
+void vc_timer(void)
+{
 	static bool running = false;
 	static std::chrono::steady_clock::time_point previousTime = std::chrono::steady_clock::now();
 
-	if (!running) {
+	if (!running)
+	{
 		running = true;
 	}
-	else {
+	else
+	{
 		std::chrono::steady_clock::time_point currentTime = std::chrono::steady_clock::now();
 		std::chrono::steady_clock::duration elapsedTime = currentTime - previousTime;
 
@@ -32,8 +35,8 @@ void vc_timer(void) {
 	}
 }
 
-
-int main(void) {
+int main(void)
+{
 	// V�deo
 	char videofile[20] = "video_resistors.mp4";
 	cv::VideoCapture capture;
@@ -55,7 +58,7 @@ int main(void) {
 	capture.open(videofile);
 
 	/* Em alternativa, abrir captura de v�deo pela Webcam #0 */
-	//capture.open(0, cv::CAP_DSHOW); // Pode-se utilizar apenas capture.open(0);
+	// capture.open(0, cv::CAP_DSHOW); // Pode-se utilizar apenas capture.open(0);
 
 	/* Verifica se foi poss�vel abrir o ficheiro de v�deo */
 	if (!capture.isOpened())
@@ -79,12 +82,14 @@ int main(void) {
 	vc_timer();
 
 	cv::Mat frame;
-	while (key != 'q') {
+	while (key != 'q')
+	{
 		/* Leitura de uma frame do v�deo */
 		capture.read(frame);
 
 		/* Verifica se conseguiu ler a frame */
-		if (frame.empty()) break;
+		if (frame.empty())
+			break;
 
 		/* N�mero da frame a processar */
 		video.nframe = (int)capture.get(cv::CAP_PROP_POS_FRAMES);
@@ -103,23 +108,43 @@ int main(void) {
 		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
 		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
 
-		
-		// Source Image 
+		// Source Image
+		int i;
 		IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
-		
+
 		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
 
-		
 		vc_bgr_to_hsv(srcimage);
-		vc_hsv_segmentation2(srcimage, 0, 150, 30, 100, 30, 100);
+		vc_hsv_segmentation2(srcimage, 30, 80, 30, 100, 30, 100);
 
+		/*int nblobs;
+		OVC *blobs;
+		blobs = vc_binary_blob_labelling2(srcimage, &nblobs);
+		if (blobs != NULL)
+		{
+
+			vc_binary_blob_info(srcimage, blobs, nblobs);
+
+			printf("\nNumber of labels: %d\n", nblobs);
+			for (i = 0; i < nblobs; i++)
+			{
+				
+
+				if (blobs[i].area > 700)
+				{
+					printf("\n-> Label %d:\n", blobs[i].label);
+					printf("  Area=%-5d Perimetro=%-5d x=%-5d y=%-5d w=%-5d h=%-5d xc=%-5d yc=%-5d\n", blobs[i].area, blobs[i].perimeter, blobs[i].x, blobs[i].y, blobs[i].width, blobs[i].height, blobs[i].xc, blobs[i].yc);
+				}
+			}
+			vc_draw_centerofgravity(srcimage, blobs, nblobs, 3);
+			vc_draw_boundingbox(srcimage, blobs, nblobs);
+
+			free(blobs);
+		}*/
 
 		memcpy(frame.data, srcimage->data, video.width * video.height * 3);
 
-		
-			
 		vc_image_free(srcimage);
-		
 		
 
 		/* Exibe a frame */

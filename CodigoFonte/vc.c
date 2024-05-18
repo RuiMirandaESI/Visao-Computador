@@ -2230,4 +2230,132 @@ int vc_bgr_to_hsv(IVC *srcdst)
     return 1;
 }
 
+OVC *vc_binary_blob_labelling2(IVC *srcdst, int *nlabels)
+{
+    unsigned char *data = (unsigned char *)srcdst->data;
+    int width = srcdst->width;
+    int height = srcdst->height;
+    int bytesperline = srcdst->bytesperline;
+    int channels = srcdst->channels;
+    int x, y, a, b;
+    long int i, size;
+    long int posX, posA, posB, posC, posD;
+    int labeltable[256] = {0};
+    int labelarea[256] = {0};
+    int label = 1; // Initial label.
+    int num, tmplabel;
+    OVC *blobs; // Pointer to an array of blobs (objects) to be returned from this function.
+
+    // Error checking
+    if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
+        return NULL;
+    if (channels != 1)
+        return NULL;
+
+    // The binary image should only contain 0 and 255 values
+    // Labels will be assigned in the range [1,254]
+    // This algorithm is thus limited to 254 labels
+    for (i = 0, size = bytesperline * height; i < size; i++)
+    {
+        if (data[i] != 0)
+            data[i] = 255;
+    }
+
+    // Clear the edges of the binary image
+    for (y = 0; y < height; y++)
+    {
+        data[y * bytesperline + 0 * channels] = 0;
+        data[y * bytesperline + (width - 1) * channels] = 0;
+    }
+    for (x = 0; x < width; x++)
+    {
+        data[0 * bytesperline + x * channels] = 0;
+        data[(height - 1) * bytesperline + x * channels] = 0;
+    }
+
+    // Perform labelling
+    for (y = 1; y < height - 1; y++)
+    {
+        for (x = 1; x < width - 1; x++)
+        {
+            // Kernel:
+            // A B C
+            // D X
+
+            posA = (y - 1) * bytesperline + (x - 1) * channels; // A
+            posB = (y - 1) * bytesperline + x * channels;       // B
+            posC = (y - 1) * bytesperline + (x + 1) * channels; // C
+            posD = y * bytesperline + (x - 1) * channels;       // D
+            posX = y * bytesperline + x * channels;             // X
+
+            // If the pixel is marked
+            if (data[posX] != 0)
+            {
+                num = 255;
+
+                // Check neighbors and find the smallest label
+                if (data[posA] != 0)
+                    num = labeltable[data[posA]];
+                if ((data[posB] != 0) && (labeltable[data[posB]] < num))
+                    num = labeltable[data[posB]];
+                if ((data[posC] != 0) && (labeltable[data[posC]] < num))
+                    num = labeltable[data[posC]];
+                if ((data[posD] != 0) && (labeltable[data[posD]] < num))
+                    num = labeltable[data[posD]];
+
+                if (num == 255) // All neighbors are zero, assign new label
+                {
+                    data[posX] = label;
+                    labeltable[label] = label;
+                    label++;
+                }
+                else
+                {
+                    data[posX] = num; // Assign the smallest label from neighbors
+
+                    // Update label table
+                    if (data[posA] != 0 && labeltable[data[posA]] != num)
+                    {
+                        tmplabel = labeltable[data[posA]];
+                        for (a = 1; a < label; a++)
+                        {
+                            if (labeltable[a] == tmplabel)
+                                labeltable[a] = num;
+                        }
+                    }
+                    // Similar updates for B, C, and D
+                }
+            }
+        }
+    }
+
+    // Count the number of blobs
+    *nlabels = 0;
+    for (a = 1; a < label; a++)
+    {
+        if (labeltable[a] != 0)
+        {
+            labelarea[*nlabels] = labeltable[a]; // Organize label table
+            (*nlabels)++;                       // Count labels
+        }
+    }
+
+    // If no blobs
+    if (*nlabels == 0)
+        return NULL;
+
+    // Create blobs list
+    blobs = (OVC *)calloc((*nlabels), sizeof(OVC));
+    if (blobs != NULL)
+    {
+        for (a = 0; a < (*nlabels); a++)
+            blobs[a].label = labelarea[a];
+    }
+    else
+        return NULL;
+
+    return blobs;
+}
+
+
 
