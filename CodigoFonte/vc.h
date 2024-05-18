@@ -67,6 +67,9 @@ void combine_segmentations(IVC *dst, IVC *src1, IVC *src2);
 int vc_white_pixels_quantitie(IVC *srcdst);
 
 int vc_gray_to_binary(IVC *srcdst, int threshold);
+
+int vc_gray_to_hsv(IVC *srcdst);
+
 int vc_gray_to_binary_global_mean(IVC *srcdst);
 
 int vc_gray_to_binary_midpoint(IVC *src, IVC *dst, int kernel);
@@ -99,13 +102,12 @@ int vc_gray_histogram_equalization(IVC *src, IVC *dst);
 
 int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th);
 
-int vc_brg_to_gray(IVC *srcdst);
+int vc_bgr_to_gray(IVC *srcdst);
 
 int vc_bgr_to_rgb(IVC *srcdst);
 
-void segment_resistors(IVC *image);
-
 int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
+
 int vc_bgr_to_hsv(IVC *srcdst);
 
 

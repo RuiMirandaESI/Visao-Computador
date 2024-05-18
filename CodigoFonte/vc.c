@@ -804,34 +804,31 @@ int vc_white_pixels_quantitie(IVC *srcdst)
 	return w;
 }
 
-int vc_gray_to_binary(IVC *srcdst, int threshold)
-{
-	unsigned char *data = (unsigned char *)srcdst->data;
-	int width = srcdst->width;
-	int height = srcdst->height;
-	int bytesperline = srcdst->width * srcdst->channels;
-	int channels = srcdst->channels;
-	int x, y, w;
-	long int pos;
+int vc_gray_to_binary(IVC *srcdst, int threshold) {
+    unsigned char *data = (unsigned char *)srcdst->data;
+    int width = srcdst->width;
+    int height = srcdst->height;
+    int bytesperline = srcdst->width * srcdst->channels;
+    int channels = srcdst->channels;
+    int x, y;
+    long int pos;
 
-	if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
-		return 0;
+    if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
+        return 0;
 
-	srcdst->levels = 1;
+    srcdst->levels = 1;
 
-	for (y = 0; y < height; y++)
-	{
-		for (x = 0; x < width; x++)
-		{
-			pos = y * bytesperline + x * channels;
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+            pos = y * bytesperline + x * channels;
 
-			if (data[pos] <= (unsigned char)threshold)
-				data[pos] = 0;
-			else
-				data[pos] = 255;
-		}
-	}
-	return 1;
+            if (data[pos] <= (unsigned char)threshold)
+                data[pos] = 0;
+            else
+                data[pos] = 255;
+        }
+    }
+    return 1;
 }
 
 int vc_gray_to_binary_global_mean(IVC *srcdst)
@@ -2049,7 +2046,7 @@ int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th) // th = [0.001, 1.000]
 	return 1;
 }
 
-int vc_brg_to_gray(IVC *srcdst) {
+int vc_bgr_to_gray(IVC *srcdst) {
     unsigned char *data = (unsigned char *)srcdst->data;
     int bytesperline = srcdst->width * srcdst->channels;
     int channels = srcdst->channels;
@@ -2108,6 +2105,47 @@ int vc_bgr_to_rgb(IVC *srcdst) {
     return 1;
 }
 
+int vc_gray_to_hsv(IVC *srcdst) {
+    unsigned char *data = (unsigned char *)srcdst->data;
+    int bytesperline = srcdst->width * srcdst->channels;
+    int channels = srcdst->channels;
+    int width = srcdst->width;
+    int height = srcdst->height;
+    int x, y;
+    long int pos;
+    float h = 0.0f;
+    float s, v;
+
+    if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
+        return 0;
+    if (srcdst->channels != 1)
+        return 0;
+
+    for (y = 0; y < height; y++) {
+        for (x = 0; x < width; x++) {
+            pos = y * bytesperline + x * channels;
+
+            unsigned char gray = data[pos];
+
+            float intensity = gray / 255.0f;
+
+            s = intensity; 
+            v = intensity; 
+
+            unsigned char hue = (unsigned char)(h * 255.0f);
+            unsigned char saturation = (unsigned char)(s * 255.0f);
+            unsigned char value = (unsigned char)(v * 255.0f);
+
+            
+            data[pos] = hue;
+            data[pos + 1] = saturation;
+            data[pos + 2] = value;
+        }
+    }
+
+    return 1;
+}
+
 int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, int vmin, int vmax)
 {
     unsigned char *data = (unsigned char *)srcdst->data;
@@ -2145,14 +2183,14 @@ int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, in
             }
             else
             {
-                data[pos] = 0;       // Set the pixel to black
+                data[pos] = 0;       
                 data[pos + 1] = 0;
                 data[pos + 2] = 0;
             }
         }
     }
 
-    return 1; // Success
+    return 1;
 }
 
 int vc_bgr_to_hsv(IVC *srcdst)

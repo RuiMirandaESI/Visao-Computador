@@ -109,19 +109,14 @@ int main(void) {
 		
 		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
 
+		vc_bgr_to_gray(srcimage);
+		vc_gray_to_hsv(srcimage);
+		vc_hsv_segmentation2(srcimage, 100, 230, 45, 100, 0, 70);		
 		
-		vc_bgr_to_hsv(srcimage);
-		vc_hsv_segmentation2(srcimage, 0, 150, 30, 100, 30, 100);
-
-
 		memcpy(frame.data, srcimage->data, video.width * video.height * 3);
-
 		
-			
 		vc_image_free(srcimage);
-		
-		
-
+	
 		/* Exibe a frame */
 		cv::imshow("VC - VIDEO", frame);
 
