@@ -92,6 +92,8 @@ int main(void)
 	IVC *dstimageGray1channel = vc_image_new(video.width, video.height, 1, 255);
 	IVC *dstimageGray3channel = vc_image_new(video.width, video.height, 3, 255);
 	IVC *image = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image2 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
 
 	while (key != 'q')
 	{
@@ -138,21 +140,37 @@ int main(void)
 
 		vc_bgr_to_hsv(srcimage);
 		vc_hsv_segmentation(srcimage, dstimageGray1channel, 30, 80, 30, 100, 30, 100);
-
+		vc_gray_erode(dstimageGray1channel, image2, 5);
+		vc_binary_dilate(image2, image3, 10);
 		
+
+		int nblobs, i;
+		OVC *blobs;
+		blobs = vc_binary_blob_labelling(image3, image, &nblobs);
+		if (blobs != NULL)
+		{
+
+			vc_binary_blob_info(image, blobs, nblobs);
+
+			printf("\nNumber of labels: %d\n", nblobs);
+			
+			vc_draw_centerofgravity(image, blobs, nblobs, 3);
+			vc_draw_boundingbox(image, blobs, nblobs);
+
+			free(blobs);
+		}
+
 		/*
 		//Para correr imagem final com 3 channels
 		vc_gray_to_rgb(dstimageGray1channel, dstimageGray3channel);
 		memcpy(frame.data, dstimageGray3channel->data, video.width * video.height* 3);
 		cv::imshow("VC - VIDEO", frame);
 		*/
-		
 
-		/*
+		
 		//Para correr imagem final com 1 channel
-		cv::Mat grayMat = IVC_to_Mat1Channel(dstimageGray1channel);
+		cv::Mat grayMat = IVC_to_Mat1Channel(image);
 		cv::imshow("VC - VIDEO", grayMat);
-		*/
 		
 
 		/* Sai da aplica��o, se o utilizador premir a tecla 'q' */
@@ -163,6 +181,8 @@ int main(void)
 	vc_image_free(dstimageGray1channel);
 	vc_image_free(dstimageGray3channel);
 	vc_image_free(image);
+	vc_image_free(image2);
+	vc_image_free(image3);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
