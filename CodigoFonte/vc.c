@@ -2437,6 +2437,110 @@ int vc_gray_to_rgb(IVC *src, IVC *dst) {
     return 1;
 }
 
+int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	int byterperline_src = src->width * src->channels;
+	int channels_src = src->channels;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int bytesperline_dst = dst->width * dst->channels;
+	int channels_dst = dst->channels;
+	int width = src->width;
+	int height = src->height;
+	int x, y;
+	long int pos_src, pos_dst;
+	float h, s, v;
+
+	if (src->width <= 0 || src->height <= 0 || src->data == NULL)
+		return 0;
+	if (src->width != dst->width || src->height != dst->height)
+		return 0;
+	if (src->channels != 3 || dst->channels != 1)
+		return 0;
+
+	// Segmentation loop
+	for (y = 0; y < height; y++)
+	{
+		for (x = 216; x < (width-216); x++)
+		{
+			pos_src = y * byterperline_src + x * channels_src;
+			pos_dst = y * bytesperline_dst + x * channels_dst;
+
+			// Assuming HSV values are stored in src and are normalized [0, 255]
+			h = (int)(((float)datasrc[pos_src]) / 255.0f * 360.0f);
+			s = (int)(((float)datasrc[pos_src + 1]) / 255.0f * 100.0f);
+			v = (int)(((float)datasrc[pos_src + 2]) / 255.0f * 100.0f);
+
+			// Check if the pixel falls within the specified HSV range
+			if (h >= hmin && h <= hmax && s >= smin && s <= smax && v >= vmin && v <= vmax)
+			{
+				datadst[pos_dst] = 255; // Pixel is within range, mark as white
+			}
+			else
+			{
+				datadst[pos_dst] = 0; // Pixel is outside range, mark as black
+			}
+		}
+	}
+
+	return 1; // Success
+}
+
+int vc_binary_erode_trabalho(IVC *src, IVC *dst, int kernel)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int offset = (kernel - 1) / 2;
+	int x, y, kx, ky;
+	int ww;
+	long int pos, posk;
+	unsigned char threshold;
+
+	// Check for valid conditions
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return 0;
+	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels))
+		return 0;
+	if (channels != 1)
+		return 0;
+
+	for (y = 0; y < height; y++)
+	{
+		for (x = 216; x < (width-216); x++)
+		{
+			pos = y * bytesperline + x * channels;
+
+			ww = 0;
+			for (ky = -offset; ky <= offset; ky++)
+			{
+
+				for (kx = -offset; kx <= offset; kx++)
+				{
+					if ((y + ky >= 0) && (y + ky < height) && (x + kx >= 0) && (x + kx < width))
+					{
+						posk = (y + ky) * bytesperline + (x + kx) * channels;
+
+						if (datasrc[posk] == 0)
+						{
+							ww = 1;
+						}
+					}
+				}
+			}
+
+			if (ww == 1)
+				datadst[pos] = 0;
+			else
+				datadst[pos] = 255;
+		}
+	}
+	return 1;
+}
+
 
 
 
