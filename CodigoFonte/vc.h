@@ -110,6 +110,10 @@ int vc_bgr_to_hsv(IVC *srcdst);
 
 OVC* vc_binary_blob_labelling2(IVC *srcdst, int *nlabels);
 
+int vc_gray_erode2(IVC *srcdst, int kernel);
+
+int vc_gray_to_rgb(IVC *src, IVC *dst);
+
 
 
 

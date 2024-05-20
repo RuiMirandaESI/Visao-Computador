@@ -2357,5 +2357,86 @@ OVC *vc_binary_blob_labelling2(IVC *srcdst, int *nlabels)
     return blobs;
 }
 
+int vc_gray_erode2(IVC *srcdst, int kernel)
+{
+    unsigned char *data = (unsigned char *)srcdst->data;
+    int width = srcdst->width;
+    int height = srcdst->height;
+    int bytesperline = srcdst->bytesperline;
+    int channels = srcdst->channels;
+    int offset = (kernel - 1) / 2;
+    int x, y, kx, ky;
+    long int pos, posk;
+    unsigned char min, value;
+
+    // Check for valid conditions
+    if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
+        return 0;
+    if (channels != 1)
+        return 0;
+
+    // Temporary buffer to hold the eroded image
+    unsigned char *temp = (unsigned char *)malloc(width * height * channels);
+    if (temp == NULL) return 0;  // Check if memory allocation failed
+
+    for (y = 0; y < height; y++)
+    {
+        for (x = 0; x < width; x++)
+        {
+            pos = y * bytesperline + x * channels;
+
+            min = 255;
+            for (ky = -offset; ky <= offset; ky++)
+            {
+                for (kx = -offset; kx <= offset; kx++)
+                {
+                    if ((y + ky >= 0) && (y + ky < height) && (x + kx >= 0) && (x + kx < width))
+                    {
+                        posk = (y + ky) * bytesperline + (x + kx) * channels;
+                        value = data[posk];
+
+                        if (min > value)
+                        {
+                            min = value;
+                        }
+                    }
+                }
+            }
+
+            temp[pos] = min; // Use the temporary buffer to store the result
+        }
+    }
+
+    // Copy the eroded image from the temporary buffer back to the original source
+    memcpy(data, temp, width * height * channels);
+    free(temp); // Free the allocated memory for the temporary buffer
+
+    return 1;
+}
+
+int vc_gray_to_rgb(IVC *src, IVC *dst) {
+    if (src->width <= 0 || src->height <= 0 || src->data == NULL)
+        return 0;
+    if (src->channels != 1)
+        return 0;
+
+    dst->width = src->width;
+    dst->height = src->height;
+    int y, x;
+    for (y = 0; y < src->height; y++) {
+        for (x = 0; x < src->width; x++) {
+            int src_pos = y * src->width + x;
+            int dst_pos = y * dst->width * dst->channels + x * dst->channels;
+
+            // Copia o valor do pixel grayscale para os três canais (R, G, B)
+            dst->data[dst_pos] = src->data[src_pos];     // B channel
+            dst->data[dst_pos + 1] = src->data[src_pos]; // G channel
+            dst->data[dst_pos + 2] = src->data[src_pos]; // R channel
+        }
+    }
+    return 1;
+}
+
+
 
 

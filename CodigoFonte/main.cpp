@@ -35,6 +35,11 @@ void vc_timer(void)
 	}
 }
 
+cv::Mat IVC_to_Mat1Channel(IVC *src)
+{
+	return cv::Mat(src->height, src->width, CV_8UC1, src->data);
+}
+
 int main(void)
 {
 	// V�deo
@@ -82,6 +87,12 @@ int main(void)
 	vc_timer();
 
 	cv::Mat frame;
+
+	IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
+	IVC *dstimageGray1channel = vc_image_new(video.width, video.height, 1, 255);
+	IVC *dstimageGray3channel = vc_image_new(video.width, video.height, 3, 255);
+	IVC *image = vc_image_new(video.width, video.height, 1, 255);
+
 	while (key != 'q')
 	{
 		/* Leitura de uma frame do v�deo */
@@ -108,51 +119,50 @@ int main(void)
 		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
 		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
 
-		// Source Image
-		int i;
-		IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
+		// Faça o seu código aqui...
+		/*
+		// Cria uma nova imagem IVC
+		IVC image = vc_image_new(video.width, video.height, 3, 255);
+		// Copia dados de imagem da estrutura cv::Mat para uma estrutura IVC
+		memcpy(image->data, frame.data, video.width video.height * 3);
+		// Executa uma função da nossa biblioteca vc
+		vc_rgb_get_green(image);
+		// Copia dados de imagem da estrutura IVC para uma estrutura cv::Mat
+		memcpy(frame.data, image->data, video.width * video.height * 3);
+		// Liberta a memória da imagem IVC que havia sido criada
+		vc_image_free(image);
+		*/
+		// +++++++++++++
 
 		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
 
 		vc_bgr_to_hsv(srcimage);
-		vc_hsv_segmentation2(srcimage, 30, 80, 30, 100, 30, 100);
+		vc_hsv_segmentation(srcimage, dstimageGray1channel, 30, 80, 30, 100, 30, 100);
 
-		/*int nblobs;
-		OVC *blobs;
-		blobs = vc_binary_blob_labelling2(srcimage, &nblobs);
-		if (blobs != NULL)
-		{
-
-			vc_binary_blob_info(srcimage, blobs, nblobs);
-
-			printf("\nNumber of labels: %d\n", nblobs);
-			for (i = 0; i < nblobs; i++)
-			{
-				
-
-				if (blobs[i].area > 700)
-				{
-					printf("\n-> Label %d:\n", blobs[i].label);
-					printf("  Area=%-5d Perimetro=%-5d x=%-5d y=%-5d w=%-5d h=%-5d xc=%-5d yc=%-5d\n", blobs[i].area, blobs[i].perimeter, blobs[i].x, blobs[i].y, blobs[i].width, blobs[i].height, blobs[i].xc, blobs[i].yc);
-				}
-			}
-			vc_draw_centerofgravity(srcimage, blobs, nblobs, 3);
-			vc_draw_boundingbox(srcimage, blobs, nblobs);
-
-			free(blobs);
-		}*/
-
-		memcpy(frame.data, srcimage->data, video.width * video.height * 3);
-
-		vc_image_free(srcimage);
+		
+		/*
+		//Para correr imagem final com 3 channels
+		vc_gray_to_rgb(dstimageGray1channel, dstimageGray3channel);
+		memcpy(frame.data, dstimageGray3channel->data, video.width * video.height* 3);
+		cv::imshow("VC - VIDEO", frame);
+		*/
 		
 
-		/* Exibe a frame */
-		cv::imshow("VC - VIDEO", frame);
+		/*
+		//Para correr imagem final com 1 channel
+		cv::Mat grayMat = IVC_to_Mat1Channel(dstimageGray1channel);
+		cv::imshow("VC - VIDEO", grayMat);
+		*/
+		
 
 		/* Sai da aplica��o, se o utilizador premir a tecla 'q' */
 		key = cv::waitKey(1);
 	}
+
+	vc_image_free(srcimage);
+	vc_image_free(dstimageGray1channel);
+	vc_image_free(dstimageGray3channel);
+	vc_image_free(image);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
