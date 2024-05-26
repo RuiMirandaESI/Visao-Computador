@@ -748,7 +748,7 @@ int vc_scale_gray_to_rgb(IVC *src, IVC *dst)
 	return 1;
 }
 
-/* void combine_segmentations(IVC *dst, IVC *src1, IVC *src2)
+void combine_segmentations(IVC *dst, IVC *src1, IVC *src2)
 {
 	if (src1->width != src2->width || src1->height != src2->height)
 	{
@@ -773,7 +773,7 @@ int vc_scale_gray_to_rgb(IVC *src, IVC *dst)
 			}
 		}
 	}
-} */
+}
 
 int vc_white_pixels_quantitie(IVC *srcdst)
 {
@@ -1880,62 +1880,72 @@ int vc_gray_histogram_show(IVC *src, IVC *dst)
 
 	printf("Maximco: %d \n", max_count);
 
-	
-	for (y = 0; y < height; y++) {
-        for (x = 0; x < 256; x++) {
-			
-            datadst[y * bytesperline_dst + x * channels_dst] = 0;
-        }
-    }
+	for (y = 0; y < height; y++)
+	{
+		for (x = 0; x < 256; x++)
+		{
 
-    // Draw histogram in destination image
-    for (int i = 0; i < 256 && i < width; i++) {
-        for (y = height - 1; y >= height - normalized_height[i] && y >= 0; y--) {
-            long int posdst = y * bytesperline_dst + i * channels_dst;
-            datadst[posdst] = 255;
-        }
-    }
+			datadst[y * bytesperline_dst + x * channels_dst] = 0;
+		}
+	}
+
+	// Draw histogram in destination image
+	for (int i = 0; i < 256 && i < width; i++)
+	{
+		for (y = height - 1; y >= height - normalized_height[i] && y >= 0; y--)
+		{
+			long int posdst = y * bytesperline_dst + i * channels_dst;
+			datadst[posdst] = 255;
+		}
+	}
 
 	return 1;
 }
 
-int vc_gray_histogram_equalization(IVC *src, IVC *dst) {
-    unsigned char *datasrc = (unsigned char*)src->data;
-    unsigned char *datadst = (unsigned char*)dst->data;
-    int width = src->width;
-    int height = src->height;
-    int bytesperline_src = src->width * src->channels;
-    int bytesperline_dst = dst->width * dst->channels;
-    int total_pixels = width * height;
-    int histogram[256] = {0};
-    int cumulative_histogram[256] = {0};
+int vc_gray_histogram_equalization(IVC *src, IVC *dst)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline_src = src->width * src->channels;
+	int bytesperline_dst = dst->width * dst->channels;
+	int total_pixels = width * height;
+	int histogram[256] = {0};
+	int cumulative_histogram[256] = {0};
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int pos_src = y * bytesperline_src + x;
-            histogram[datasrc[pos_src]]++;
-        }
-    }
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			int pos_src = y * bytesperline_src + x;
+			histogram[datasrc[pos_src]]++;
+		}
+	}
 
-    cumulative_histogram[0] = histogram[0];
-    for (int i = 1; i < 256; i++) {
-        cumulative_histogram[i] = cumulative_histogram[i - 1] + histogram[i];
-    }
+	cumulative_histogram[0] = histogram[0];
+	for (int i = 1; i < 256; i++)
+	{
+		cumulative_histogram[i] = cumulative_histogram[i - 1] + histogram[i];
+	}
 
-    float equalization_function[256];
-    for (int i = 0; i < 256; i++) {
-        equalization_function[i] = ((float)cumulative_histogram[i] / total_pixels) * 255;
-    }
+	float equalization_function[256];
+	for (int i = 0; i < 256; i++)
+	{
+		equalization_function[i] = ((float)cumulative_histogram[i] / total_pixels) * 255;
+	}
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int pos_src = y * bytesperline_src + x;
-            int pos_dst = y * bytesperline_dst + x;
-            datadst[pos_dst] = equalization_function[datasrc[pos_src]];
-        }
-    }
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			int pos_src = y * bytesperline_src + x;
+			int pos_dst = y * bytesperline_dst + x;
+			datadst[pos_dst] = equalization_function[datasrc[pos_src]];
+		}
+	}
 
-    return 1;
+	return 1;
 }
 
 int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th) // th = [0.001, 1.000]
@@ -1952,18 +1962,21 @@ int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th) // th = [0.001, 1.000]
 	float histmax;
 	int histthreshold;
 	int sumx, sumy;
-	float hist[256] = { 0.0f };
+	float hist[256] = {0.0f};
 
 	// Verificação de erros
-	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL)) return 0;
-	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels)) return 0;
-	if (channels != 1) return 0;
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return 0;
+	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels))
+		return 0;
+	if (channels != 1)
+		return 0;
 
 	size = width * height;
 
-	for (y = 1; y<height - 1; y++)
+	for (y = 1; y < height - 1; y++)
 	{
-		for (x = 1; x<width - 1; x++)
+		for (x = 1; x < width - 1; x++)
 		{
 			// PosA PosB PosC
 			// PosD PosX PosE
@@ -2005,15 +2018,15 @@ int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th) // th = [0.001, 1.000]
 			sumy += datasrc[posH] * +1;
 			sumy = sumy / 3; // 3 = 1 + 1 + 1
 
-			//datadst[posX] = (unsigned char)sqrt((double)(sumx*sumx + sumy*sumy));
-			datadst[posX] = (unsigned char) (sqrt((double) (sumx*sumx + sumy*sumy)) / sqrt(2.0));
+			// datadst[posX] = (unsigned char)sqrt((double)(sumx*sumx + sumy*sumy));
+			datadst[posX] = (unsigned char)(sqrt((double)(sumx * sumx + sumy * sumy)) / sqrt(2.0));
 			// Explicação:
 			// Queremos que no caso do pior cenário, em que sumx = sumy = 255, o resultado
 			// da operação se mantenha no intervalo de valores admitido, isto é, entre [0, 255].
 			// Se se considerar que:
 			// max = 255
 			// Então,
-			// sqrt(pow(max,2) + pow(max,2)) * k = max <=> sqrt(2*pow(max,2)) * k = max <=> k = max / (sqrt(2) * max) <=> 
+			// sqrt(pow(max,2) + pow(max,2)) * k = max <=> sqrt(2*pow(max,2)) * k = max <=> k = max / (sqrt(2) * max) <=>
 			// k = 1 / sqrt(2)
 		}
 	}
@@ -2027,7 +2040,7 @@ int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th) // th = [0.001, 1.000]
 	// Definir o threshold.
 	// O threshold é definido pelo nível de intensidade (das magnitudes)
 	// quando se atinge uma determinada percentagem de pixeis, definida pelo utilizador.
-	// Por exemplo, se o parâmetro 'th' tiver valor 0.8, significa the o threshold será o 
+	// Por exemplo, se o parâmetro 'th' tiver valor 0.8, significa the o threshold será o
 	// nível de magnitude, abaixo do qual estão pelo menos 80% dos pixeis.
 	histmax = 0.0f;
 	for (i = 0; i <= 255; i++)
@@ -2035,406 +2048,421 @@ int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th) // th = [0.001, 1.000]
 		histmax += hist[i];
 
 		// th = Prewitt Threshold
-		if (histmax >= (((float)size) * th)) break;
+		if (histmax >= (((float)size) * th))
+			break;
 	}
 	histthreshold = i == 0 ? 1 : i;
 
 	// Aplicada o threshold
 	for (i = 0; i < size; i++)
 	{
-		if (datadst[i] >= (unsigned char) histthreshold) datadst[i] = 255;
-		else datadst[i] = 0;
+		if (datadst[i] >= (unsigned char)histthreshold)
+			datadst[i] = 255;
+		else
+			datadst[i] = 0;
 	}
 
 	return 1;
 }
 
-int vc_brg_to_gray(IVC *srcdst) {
-    unsigned char *data = (unsigned char *)srcdst->data;
-    int bytesperline = srcdst->width * srcdst->channels;
-    int channels = srcdst->channels;
-    int width = srcdst->width;
-    int height = srcdst->height;
-    int x, y;
-    long int pos;
-    float rf, gf, bf;
+int vc_brg_to_gray(IVC *srcdst)
+{
+	unsigned char *data = (unsigned char *)srcdst->data;
+	int bytesperline = srcdst->width * srcdst->channels;
+	int channels = srcdst->channels;
+	int width = srcdst->width;
+	int height = srcdst->height;
+	int x, y;
+	long int pos;
+	float rf, gf, bf;
 
-    if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
-        return 0;
-    if (srcdst->channels != 3)
-        return 0;
+	if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
+		return 0;
+	if (srcdst->channels != 3)
+		return 0;
 
-    for (y = 0; y < height; y++) {
-        for (x = 0; x < width; x++) {
-            pos = y * bytesperline + x * channels;
+	for (y = 0; y < height; y++)
+	{
+		for (x = 0; x < width; x++)
+		{
+			pos = y * bytesperline + x * channels;
 
-            // Adjusted for BGR format
-            bf = (float)data[pos];
-            gf = (float)data[pos + 1];
-            rf = (float)data[pos + 2];
+			// Adjusted for BGR format
+			bf = (float)data[pos];
+			gf = (float)data[pos + 1];
+			rf = (float)data[pos + 2];
 
-            // Calculate grayscale value using the luminosity method
-            unsigned char gray = (unsigned char)((bf * 0.114) + (gf * 0.587) + (rf * 0.299));
+			// Calculate grayscale value using the luminosity method
+			unsigned char gray = (unsigned char)((bf * 0.114) + (gf * 0.587) + (rf * 0.299));
 
-            // Update the BGR image in place to grayscale (all channels the same)
-            data[pos] = gray;      // B channel
-            data[pos + 1] = gray;  // G channel
-            data[pos + 2] = gray;  // R channel
-        }
-    }
-    return 1;
+			// Update the BGR image in place to grayscale (all channels the same)
+			data[pos] = gray;	  // B channel
+			data[pos + 1] = gray; // G channel
+			data[pos + 2] = gray; // R channel
+		}
+	}
+	return 1;
 }
 
-int vc_bgr_to_rgb(IVC *srcdst) {
-    if (srcdst == NULL) return 0;
-    if (srcdst->channels != 3) return 0;
+int vc_bgr_to_rgb(IVC *srcdst)
+{
+	if (srcdst == NULL)
+		return 0;
+	if (srcdst->channels != 3)
+		return 0;
 
-    unsigned char temp;
-    int width = srcdst->width;
-    int height = srcdst->height;
-    int bytesperline = srcdst->bytesperline;
-    int channels = srcdst->channels;
-    unsigned char *data = srcdst->data;
+	unsigned char temp;
+	int width = srcdst->width;
+	int height = srcdst->height;
+	int bytesperline = srcdst->bytesperline;
+	int channels = srcdst->channels;
+	unsigned char *data = srcdst->data;
 
-    for (int y = 0; y < height; y++) {
-        for (int x = 0; x < width; x++) {
-            int pos = y * bytesperline + x * channels;
+	for (int y = 0; y < height; y++)
+	{
+		for (int x = 0; x < width; x++)
+		{
+			int pos = y * bytesperline + x * channels;
 
-            temp = data[pos];
-            data[pos] = data[pos + 2];
-            data[pos + 2] = temp;
-        }
-    }
-    return 1;
+			temp = data[pos];
+			data[pos] = data[pos + 2];
+			data[pos + 2] = temp;
+		}
+	}
+	return 1;
 }
 
 int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, int vmin, int vmax)
 {
-    unsigned char *data = (unsigned char *)srcdst->data;
-    int bytesperline = srcdst->width * srcdst->channels;
-    int channels = srcdst->channels;
-    int width = srcdst->width;
-    int height = srcdst->height;
-    int x, y;
-    long int pos;
-    float h, s, v;
+	unsigned char *data = (unsigned char *)srcdst->data;
+	int bytesperline = srcdst->width * srcdst->channels;
+	int channels = srcdst->channels;
+	int width = srcdst->width;
+	int height = srcdst->height;
+	int x, y;
+	long int pos;
+	float h, s, v;
 
-    if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
-        return 0;
-    if (srcdst->channels != 3)
-        return 0;
+	if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
+		return 0;
+	if (srcdst->channels != 3)
+		return 0;
 
-    // Segmentation loop
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            pos = y * bytesperline + x * channels;
+	// Segmentation loop
+	for (y = 0; y < height; y++)
+	{
+		for (x = 0; x < width; x++)
+		{
+			pos = y * bytesperline + x * channels;
 
-            // Assuming HSV values are stored in srcdst and are normalized [0, 255]
-            h = (int)(((float)data[pos]) / 255.0f * 360.0f);
-            s = (int)(((float)data[pos + 1]) / 255.0f * 100.0f);
-            v = (int)(((float)data[pos + 2]) / 255.0f * 100.0f);
+			// Assuming HSV values are stored in srcdst and are normalized [0, 255]
+			h = (int)(((float)data[pos]) / 255.0f * 360.0f);
+			s = (int)(((float)data[pos + 1]) / 255.0f * 100.0f);
+			v = (int)(((float)data[pos + 2]) / 255.0f * 100.0f);
 
-            // Check if the pixel falls within the specified HSV range
-            if (h >= hmin && h <= hmax && s >= smin && s <= smax && v >= vmin && v <= vmax)
-            {
-                data[pos] = 255;     // Set the pixel to white
-                data[pos + 1] = 255;
-                data[pos + 2] = 255;
-            }
-            else
-            {
-                data[pos] = 0;       // Set the pixel to black
-                data[pos + 1] = 0;
-                data[pos + 2] = 0;
-            }
-        }
-    }
+			// Check if the pixel falls within the specified HSV range
+			if (h >= hmin && h <= hmax && s >= smin && s <= smax && v >= vmin && v <= vmax)
+			{
+				data[pos] = 255; // Set the pixel to white
+				data[pos + 1] = 255;
+				data[pos + 2] = 255;
+			}
+			else
+			{
+				data[pos] = 0; // Set the pixel to black
+				data[pos + 1] = 0;
+				data[pos + 2] = 0;
+			}
+		}
+	}
 
-    return 1; // Success
+	return 1; // Success
 }
 
 int vc_bgr_to_hsv(IVC *srcdst)
 {
-    unsigned char *data = (unsigned char *)srcdst->data;
-    int width = srcdst->width;
-    int height = srcdst->height;
-    int bytesperline = srcdst->bytesperline;
-    int channels = srcdst->channels;
-    float r, g, b, saturation, hue, value;
-    int i, size;
-    int pos_src;
-    float rgb_max;
-    float rgb_min;
+	unsigned char *data = (unsigned char *)srcdst->data;
+	int width = srcdst->width;
+	int height = srcdst->height;
+	int bytesperline = srcdst->bytesperline;
+	int channels = srcdst->channels;
+	float r, g, b, saturation, hue, value;
+	int i, size;
+	int pos_src;
+	float rgb_max;
+	float rgb_min;
 
-    if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
-        return 0;
-    if (channels != 3)
-        return 0;
+	if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
+		return 0;
+	if (channels != 3)
+		return 0;
 
-    size = width * height * channels;
+	size = width * height * channels;
 
-    for (i = 0; i < size; i += channels)
-    {
-        pos_src = i;
+	for (i = 0; i < size; i += channels)
+	{
+		pos_src = i;
 
-        b = (float)data[pos_src];
-        g = (float)data[pos_src + 1];
-        r = (float)data[pos_src + 2];
+		b = (float)data[pos_src];
+		g = (float)data[pos_src + 1];
+		r = (float)data[pos_src + 2];
 
-        rgb_max = fmaxf(r, fmaxf(g, b));
-        rgb_min = fminf(r, fminf(g, b));
+		rgb_max = fmaxf(r, fmaxf(g, b));
+		rgb_min = fminf(r, fminf(g, b));
 
-        value = rgb_max;
+		value = rgb_max;
 
-        if (value == 0.0f)
-        {
-            hue = 0.0f;
-            saturation = 0.0f;
-        }
-        else
-        {
-            saturation = ((rgb_max - rgb_min) / rgb_max) * 255.0f;
+		if (value == 0.0f)
+		{
+			hue = 0.0f;
+			saturation = 0.0f;
+		}
+		else
+		{
+			saturation = ((rgb_max - rgb_min) / rgb_max) * 255.0f;
 
-            if (saturation == 0.0f)
-            {
-                hue = 0.0f;
-            }
-            else
-            {
-                if ((rgb_max == r) && (g >= b))
-                {
-                    hue = 60.0f * (g - b) / (rgb_max - rgb_min);
-                }
-                else if ((rgb_max == r) && (b > g))
-                {
-                    hue = 360.0f + 60.0f * (g - b) / (rgb_max - rgb_min);
-                }
-                else if (rgb_max == g)
-                {
-                    hue = 120.0f + 60.0f * (b - r) / (rgb_max - rgb_min);
-                }
-                else if (rgb_max == b)
-                {
-                    hue = 240.0f + 60.0f * (r - g) / (rgb_max - rgb_min);
-                }
-            }
-        }
+			if (saturation == 0.0f)
+			{
+				hue = 0.0f;
+			}
+			else
+			{
+				if ((rgb_max == r) && (g >= b))
+				{
+					hue = 60.0f * (g - b) / (rgb_max - rgb_min);
+				}
+				else if ((rgb_max == r) && (b > g))
+				{
+					hue = 360.0f + 60.0f * (g - b) / (rgb_max - rgb_min);
+				}
+				else if (rgb_max == g)
+				{
+					hue = 120.0f + 60.0f * (b - r) / (rgb_max - rgb_min);
+				}
+				else if (rgb_max == b)
+				{
+					hue = 240.0f + 60.0f * (r - g) / (rgb_max - rgb_min);
+				}
+			}
+		}
 
-        data[i] = (unsigned char)(hue / 360.0f * 255.0f);
-        data[i + 1] = (unsigned char)(saturation);
-        data[i + 2] = (unsigned char)(value);
-    }
+		data[i] = (unsigned char)(hue / 360.0f * 255.0f);
+		data[i + 1] = (unsigned char)(saturation);
+		data[i + 2] = (unsigned char)(value);
+	}
 
-    return 1;
+	return 1;
 }
 
 OVC *vc_binary_blob_labelling2(IVC *srcdst, int *nlabels)
 {
-    unsigned char *data = (unsigned char *)srcdst->data;
-    int width = srcdst->width;
-    int height = srcdst->height;
-    int bytesperline = srcdst->bytesperline;
-    int channels = srcdst->channels;
-    int x, y, a, b;
-    long int i, size;
-    long int posX, posA, posB, posC, posD;
-    int labeltable[256] = {0};
-    int labelarea[256] = {0};
-    int label = 1; // Initial label.
-    int num, tmplabel;
-    OVC *blobs; // Pointer to an array of blobs (objects) to be returned from this function.
+	unsigned char *data = (unsigned char *)srcdst->data;
+	int width = srcdst->width;
+	int height = srcdst->height;
+	int bytesperline = srcdst->bytesperline;
+	int channels = srcdst->channels;
+	int x, y, a, b;
+	long int i, size;
+	long int posX, posA, posB, posC, posD;
+	int labeltable[256] = {0};
+	int labelarea[256] = {0};
+	int label = 1; // Initial label.
+	int num, tmplabel;
+	OVC *blobs; // Pointer to an array of blobs (objects) to be returned from this function.
 
-    // Error checking
-    if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
-        return NULL;
-    if (channels != 1)
-        return NULL;
+	// Error checking
+	if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
+		return NULL;
+	if (channels != 1)
+		return NULL;
 
-    // The binary image should only contain 0 and 255 values
-    // Labels will be assigned in the range [1,254]
-    // This algorithm is thus limited to 254 labels
-    for (i = 0, size = bytesperline * height; i < size; i++)
-    {
-        if (data[i] != 0)
-            data[i] = 255;
-    }
+	// The binary image should only contain 0 and 255 values
+	// Labels will be assigned in the range [1,254]
+	// This algorithm is thus limited to 254 labels
+	for (i = 0, size = bytesperline * height; i < size; i++)
+	{
+		if (data[i] != 0)
+			data[i] = 255;
+	}
 
-    // Clear the edges of the binary image
-    for (y = 0; y < height; y++)
-    {
-        data[y * bytesperline + 0 * channels] = 0;
-        data[y * bytesperline + (width - 1) * channels] = 0;
-    }
-    for (x = 0; x < width; x++)
-    {
-        data[0 * bytesperline + x * channels] = 0;
-        data[(height - 1) * bytesperline + x * channels] = 0;
-    }
+	// Clear the edges of the binary image
+	for (y = 0; y < height; y++)
+	{
+		data[y * bytesperline + 0 * channels] = 0;
+		data[y * bytesperline + (width - 1) * channels] = 0;
+	}
+	for (x = 0; x < width; x++)
+	{
+		data[0 * bytesperline + x * channels] = 0;
+		data[(height - 1) * bytesperline + x * channels] = 0;
+	}
 
-    // Perform labelling
-    for (y = 1; y < height - 1; y++)
-    {
-        for (x = 1; x < width - 1; x++)
-        {
-            // Kernel:
-            // A B C
-            // D X
+	// Perform labelling
+	for (y = 1; y < height - 1; y++)
+	{
+		for (x = 1; x < width - 1; x++)
+		{
+			// Kernel:
+			// A B C
+			// D X
 
-            posA = (y - 1) * bytesperline + (x - 1) * channels; // A
-            posB = (y - 1) * bytesperline + x * channels;       // B
-            posC = (y - 1) * bytesperline + (x + 1) * channels; // C
-            posD = y * bytesperline + (x - 1) * channels;       // D
-            posX = y * bytesperline + x * channels;             // X
+			posA = (y - 1) * bytesperline + (x - 1) * channels; // A
+			posB = (y - 1) * bytesperline + x * channels;		// B
+			posC = (y - 1) * bytesperline + (x + 1) * channels; // C
+			posD = y * bytesperline + (x - 1) * channels;		// D
+			posX = y * bytesperline + x * channels;				// X
 
-            // If the pixel is marked
-            if (data[posX] != 0)
-            {
-                num = 255;
+			// If the pixel is marked
+			if (data[posX] != 0)
+			{
+				num = 255;
 
-                // Check neighbors and find the smallest label
-                if (data[posA] != 0)
-                    num = labeltable[data[posA]];
-                if ((data[posB] != 0) && (labeltable[data[posB]] < num))
-                    num = labeltable[data[posB]];
-                if ((data[posC] != 0) && (labeltable[data[posC]] < num))
-                    num = labeltable[data[posC]];
-                if ((data[posD] != 0) && (labeltable[data[posD]] < num))
-                    num = labeltable[data[posD]];
+				// Check neighbors and find the smallest label
+				if (data[posA] != 0)
+					num = labeltable[data[posA]];
+				if ((data[posB] != 0) && (labeltable[data[posB]] < num))
+					num = labeltable[data[posB]];
+				if ((data[posC] != 0) && (labeltable[data[posC]] < num))
+					num = labeltable[data[posC]];
+				if ((data[posD] != 0) && (labeltable[data[posD]] < num))
+					num = labeltable[data[posD]];
 
-                if (num == 255) // All neighbors are zero, assign new label
-                {
-                    data[posX] = label;
-                    labeltable[label] = label;
-                    label++;
-                }
-                else
-                {
-                    data[posX] = num; // Assign the smallest label from neighbors
+				if (num == 255) // All neighbors are zero, assign new label
+				{
+					data[posX] = label;
+					labeltable[label] = label;
+					label++;
+				}
+				else
+				{
+					data[posX] = num; // Assign the smallest label from neighbors
 
-                    // Update label table
-                    if (data[posA] != 0 && labeltable[data[posA]] != num)
-                    {
-                        tmplabel = labeltable[data[posA]];
-                        for (a = 1; a < label; a++)
-                        {
-                            if (labeltable[a] == tmplabel)
-                                labeltable[a] = num;
-                        }
-                    }
-                    // Similar updates for B, C, and D
-                }
-            }
-        }
-    }
+					// Update label table
+					if (data[posA] != 0 && labeltable[data[posA]] != num)
+					{
+						tmplabel = labeltable[data[posA]];
+						for (a = 1; a < label; a++)
+						{
+							if (labeltable[a] == tmplabel)
+								labeltable[a] = num;
+						}
+					}
+					// Similar updates for B, C, and D
+				}
+			}
+		}
+	}
 
-    // Count the number of blobs
-    *nlabels = 0;
-    for (a = 1; a < label; a++)
-    {
-        if (labeltable[a] != 0)
-        {
-            labelarea[*nlabels] = labeltable[a]; // Organize label table
-            (*nlabels)++;                       // Count labels
-        }
-    }
+	// Count the number of blobs
+	*nlabels = 0;
+	for (a = 1; a < label; a++)
+	{
+		if (labeltable[a] != 0)
+		{
+			labelarea[*nlabels] = labeltable[a]; // Organize label table
+			(*nlabels)++;						 // Count labels
+		}
+	}
 
-    // If no blobs
-    if (*nlabels == 0)
-        return NULL;
+	// If no blobs
+	if (*nlabels == 0)
+		return NULL;
 
-    // Create blobs list
-    blobs = (OVC *)calloc((*nlabels), sizeof(OVC));
-    if (blobs != NULL)
-    {
-        for (a = 0; a < (*nlabels); a++)
-            blobs[a].label = labelarea[a];
-    }
-    else
-        return NULL;
+	// Create blobs list
+	blobs = (OVC *)calloc((*nlabels), sizeof(OVC));
+	if (blobs != NULL)
+	{
+		for (a = 0; a < (*nlabels); a++)
+			blobs[a].label = labelarea[a];
+	}
+	else
+		return NULL;
 
-    return blobs;
+	return blobs;
 }
 
 int vc_gray_erode2(IVC *srcdst, int kernel)
 {
-    unsigned char *data = (unsigned char *)srcdst->data;
-    int width = srcdst->width;
-    int height = srcdst->height;
-    int bytesperline = srcdst->bytesperline;
-    int channels = srcdst->channels;
-    int offset = (kernel - 1) / 2;
-    int x, y, kx, ky;
-    long int pos, posk;
-    unsigned char min, value;
+	unsigned char *data = (unsigned char *)srcdst->data;
+	int width = srcdst->width;
+	int height = srcdst->height;
+	int bytesperline = srcdst->bytesperline;
+	int channels = srcdst->channels;
+	int offset = (kernel - 1) / 2;
+	int x, y, kx, ky;
+	long int pos, posk;
+	unsigned char min, value;
 
-    // Check for valid conditions
-    if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
-        return 0;
-    if (channels != 1)
-        return 0;
+	// Check for valid conditions
+	if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
+		return 0;
+	if (channels != 1)
+		return 0;
 
-    // Temporary buffer to hold the eroded image
-    unsigned char *temp = (unsigned char *)malloc(width * height * channels);
-    if (temp == NULL) return 0;  // Check if memory allocation failed
+	// Temporary buffer to hold the eroded image
+	unsigned char *temp = (unsigned char *)malloc(width * height * channels);
+	if (temp == NULL)
+		return 0; // Check if memory allocation failed
 
-    for (y = 0; y < height; y++)
-    {
-        for (x = 0; x < width; x++)
-        {
-            pos = y * bytesperline + x * channels;
+	for (y = 0; y < height; y++)
+	{
+		for (x = 0; x < width; x++)
+		{
+			pos = y * bytesperline + x * channels;
 
-            min = 255;
-            for (ky = -offset; ky <= offset; ky++)
-            {
-                for (kx = -offset; kx <= offset; kx++)
-                {
-                    if ((y + ky >= 0) && (y + ky < height) && (x + kx >= 0) && (x + kx < width))
-                    {
-                        posk = (y + ky) * bytesperline + (x + kx) * channels;
-                        value = data[posk];
+			min = 255;
+			for (ky = -offset; ky <= offset; ky++)
+			{
+				for (kx = -offset; kx <= offset; kx++)
+				{
+					if ((y + ky >= 0) && (y + ky < height) && (x + kx >= 0) && (x + kx < width))
+					{
+						posk = (y + ky) * bytesperline + (x + kx) * channels;
+						value = data[posk];
 
-                        if (min > value)
-                        {
-                            min = value;
-                        }
-                    }
-                }
-            }
+						if (min > value)
+						{
+							min = value;
+						}
+					}
+				}
+			}
 
-            temp[pos] = min; // Use the temporary buffer to store the result
-        }
-    }
+			temp[pos] = min; // Use the temporary buffer to store the result
+		}
+	}
 
-    // Copy the eroded image from the temporary buffer back to the original source
-    memcpy(data, temp, width * height * channels);
-    free(temp); // Free the allocated memory for the temporary buffer
+	// Copy the eroded image from the temporary buffer back to the original source
+	memcpy(data, temp, width * height * channels);
+	free(temp); // Free the allocated memory for the temporary buffer
 
-    return 1;
+	return 1;
 }
 
-int vc_gray_to_rgb(IVC *src, IVC *dst) {
-    if (src->width <= 0 || src->height <= 0 || src->data == NULL)
-        return 0;
-    if (src->channels != 1)
-        return 0;
+int vc_gray_to_rgb(IVC *src, IVC *dst)
+{
+	if (src->width <= 0 || src->height <= 0 || src->data == NULL)
+		return 0;
+	if (src->channels != 1)
+		return 0;
 
-    dst->width = src->width;
-    dst->height = src->height;
-    int y, x;
-    for (y = 0; y < src->height; y++) {
-        for (x = 0; x < src->width; x++) {
-            int src_pos = y * src->width + x;
-            int dst_pos = y * dst->width * dst->channels + x * dst->channels;
+	dst->width = src->width;
+	dst->height = src->height;
+	int y, x;
+	for (y = 0; y < src->height; y++)
+	{
+		for (x = 0; x < src->width; x++)
+		{
+			int src_pos = y * src->width + x;
+			int dst_pos = y * dst->width * dst->channels + x * dst->channels;
 
-            // Copia o valor do pixel grayscale para os três canais (R, G, B)
-            dst->data[dst_pos] = src->data[src_pos];     // B channel
-            dst->data[dst_pos + 1] = src->data[src_pos]; // G channel
-            dst->data[dst_pos + 2] = src->data[src_pos]; // R channel
-        }
-    }
-    return 1;
+			// Copia o valor do pixel grayscale para os três canais (R, G, B)
+			dst->data[dst_pos] = src->data[src_pos];	 // B channel
+			dst->data[dst_pos + 1] = src->data[src_pos]; // G channel
+			dst->data[dst_pos + 2] = src->data[src_pos]; // R channel
+		}
+	}
+	return 1;
 }
 
 int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax)
@@ -2461,7 +2489,7 @@ int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smi
 	// Segmentation loop
 	for (y = 0; y < height; y++)
 	{
-		for (x = 216; x < (width-216); x++)
+		for (x = 216; x < (width - 216); x++)
 		{
 			pos_src = y * byterperline_src + x * channels_src;
 			pos_dst = y * bytesperline_dst + x * channels_dst;
@@ -2510,7 +2538,7 @@ int vc_binary_erode_trabalho(IVC *src, IVC *dst, int kernel)
 
 	for (y = 0; y < height; y++)
 	{
-		for (x = 216; x < (width-216); x++)
+		for (x = 216; x < (width - 216); x++)
 		{
 			pos = y * bytesperline + x * channels;
 
@@ -2541,6 +2569,370 @@ int vc_binary_erode_trabalho(IVC *src, IVC *dst, int kernel)
 	return 1;
 }
 
+int vc_binary_dilate_trabalho(IVC *src, IVC *dst, int kernel)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int offset = (kernel - 1) / 2;
+	int x, y, kx, ky;
+	int soma;
+	long int pos, posk;
+	unsigned char threshold;
 
+	// Check for valid conditions
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return 0;
+	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels))
+		return 0;
+	if (channels != 1)
+		return 0;
 
+	for (y = 0; y < height; y++)
+	{
+		for (x = 216; x < (width - 216); x++)
+		{
+			pos = y * bytesperline + x * channels;
 
+			soma = 0;
+			for (ky = -offset; ky <= offset; ky++)
+			{
+
+				for (kx = -offset; kx <= offset; kx++)
+				{
+					if ((y + ky >= 0) && (y + ky < height) && (x + kx >= 0) && (x + kx < width))
+					{
+						posk = (y + ky) * bytesperline + (x + kx) * channels;
+
+						soma += datasrc[posk];
+					}
+				}
+			}
+
+			if (soma >= 1)
+				datadst[pos] = 255;
+			else
+				datadst[pos] = 0;
+		}
+	}
+	return 1;
+}
+
+void combine_segmentations_trabalho(IVC *dst, IVC *src1, IVC *src2)
+{
+	if (src1->width != src2->width || src1->height != src2->height)
+	{
+		printf("ERROR -> combine_segmentations():\n\tImages size mismatch!\n");
+		return;
+	}
+
+	for (int y = 0; y < src1->height; y++)
+	{
+		for (int x = 216; x < ((src1->width) - 216); x++)
+		{
+			int pos = y * (src1->width) + x; // Assume imagens de destino são monocromáticas
+
+			// Se algum dos pixels nas imagens temporárias for branco, defina o correspondente em dst como branco
+			if (src1->data[pos] == 255 || src2->data[pos] == 255)
+			{
+				dst->data[pos] = 255;
+			}
+			else
+			{
+				dst->data[pos] = 0;
+			}
+		}
+	}
+}
+
+OVC *vc_binary_blob_labelling_trabalho(IVC *src, IVC *dst, int *nlabels)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int x, y, a, b;
+	long int i, size;
+	long int posX, posA, posB, posC, posD;
+	int labeltable[256] = {0};
+	int labelarea[256] = {0};
+	int label = 1; // Etiqueta inicial.
+	int num, tmplabel;
+	OVC *blobs; // Apontador para array de blobs (objectos) que ser� retornado desta fun��o.
+
+	// Verifica��o de erros
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return 0;
+	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels))
+		return NULL;
+	if (channels != 1)
+		return NULL;
+
+	// Copia dados da imagem bin�ria para imagem grayscale
+	memcpy(datadst, datasrc, bytesperline * height);
+
+	// Todos os pix�is de plano de fundo devem obrigat�riamente ter valor 0
+	// Todos os pix�is de primeiro plano devem obrigat�riamente ter valor 255
+	// Ser�o atribu�das etiquetas no intervalo [1,254]
+	// Este algoritmo est� assim limitado a 254 labels
+	for (i = 0, size = bytesperline * height; i < size; i++)
+	{
+		if (datadst[i] != 0)
+			datadst[i] = 255;
+	}
+
+	// Limpa os rebordos da imagem bin�ria
+	for (y = 0; y < height; y++)
+	{
+		datadst[y * bytesperline + 0 * channels] = 0;
+		datadst[y * bytesperline + (width - 1) * channels] = 0;
+	}
+	for (x = 216; x < (width - 216); x++)
+	{
+		datadst[0 * bytesperline + x * channels] = 0;
+		datadst[(height - 1) * bytesperline + x * channels] = 0;
+	}
+
+	// Efectua a etiquetagem
+	for (y = 1; y < height - 1; y++)
+	{
+		for (x = (1 + 216); x < (width - 1 - 216); x++)
+		{
+			// Kernel:
+			// A B C
+			// D X
+
+			posA = (y - 1) * bytesperline + (x - 1) * channels; // A
+			posB = (y - 1) * bytesperline + x * channels;		// B
+			posC = (y - 1) * bytesperline + (x + 1) * channels; // C
+			posD = y * bytesperline + (x - 1) * channels;		// D
+			posX = y * bytesperline + x * channels;				// X
+
+			// Se o pixel foi marcado
+			if (datadst[posX] != 0)
+			{
+				if ((datadst[posA] == 0) && (datadst[posB] == 0) && (datadst[posC] == 0) && (datadst[posD] == 0))
+				{
+					datadst[posX] = label;
+					labeltable[label] = label;
+					label++;
+				}
+				else
+				{
+					num = 255;
+
+					// Se A est� marcado
+					if (datadst[posA] != 0)
+						num = labeltable[datadst[posA]];
+					// Se B est� marcado, e � menor que a etiqueta "num"
+					if ((datadst[posB] != 0) && (labeltable[datadst[posB]] < num))
+						num = labeltable[datadst[posB]];
+					// Se C est� marcado, e � menor que a etiqueta "num"
+					if ((datadst[posC] != 0) && (labeltable[datadst[posC]] < num))
+						num = labeltable[datadst[posC]];
+					// Se D est� marcado, e � menor que a etiqueta "num"
+					if ((datadst[posD] != 0) && (labeltable[datadst[posD]] < num))
+						num = labeltable[datadst[posD]];
+
+					// Atribui a etiqueta ao pixel
+					datadst[posX] = num;
+					labeltable[num] = num;
+
+					// Actualiza a tabela de etiquetas
+					if (datadst[posA] != 0)
+					{
+						if (labeltable[datadst[posA]] != num)
+						{
+							for (tmplabel = labeltable[datadst[posA]], a = 1; a < label; a++)
+							{
+								if (labeltable[a] == tmplabel)
+								{
+									labeltable[a] = num;
+								}
+							}
+						}
+					}
+					if (datadst[posB] != 0)
+					{
+						if (labeltable[datadst[posB]] != num)
+						{
+							for (tmplabel = labeltable[datadst[posB]], a = 1; a < label; a++)
+							{
+								if (labeltable[a] == tmplabel)
+								{
+									labeltable[a] = num;
+								}
+							}
+						}
+					}
+					if (datadst[posC] != 0)
+					{
+						if (labeltable[datadst[posC]] != num)
+						{
+							for (tmplabel = labeltable[datadst[posC]], a = 1; a < label; a++)
+							{
+								if (labeltable[a] == tmplabel)
+								{
+									labeltable[a] = num;
+								}
+							}
+						}
+					}
+					if (datadst[posD] != 0)
+					{
+						if (labeltable[datadst[posD]] != num)
+						{
+							for (tmplabel = labeltable[datadst[posD]], a = 1; a < label; a++)
+							{
+								if (labeltable[a] == tmplabel)
+								{
+									labeltable[a] = num;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// Volta a etiquetar a imagem
+	for (y = 1; y < height - 1; y++)
+	{
+		for (x = (1 + 216); x < (width - 1 - 216); x++)
+		{
+			posX = y * bytesperline + x * channels; // X
+
+			if (datadst[posX] != 0)
+			{
+				datadst[posX] = labeltable[datadst[posX]];
+			}
+		}
+	}
+
+	// printf("\nMax Label = %d\n", label);
+
+	// Contagem do n�mero de blobs
+	// Passo 1: Eliminar, da tabela, etiquetas repetidas
+	for (a = 1; a < label - 1; a++)
+	{
+		for (b = a + 1; b < label; b++)
+		{
+			if (labeltable[a] == labeltable[b])
+				labeltable[b] = 0;
+		}
+	}
+	// Passo 2: Conta etiquetas e organiza a tabela de etiquetas, para que n�o hajam valores vazios (zero) entre etiquetas
+	*nlabels = 0;
+	for (a = 1; a < label; a++)
+	{
+		if (labeltable[a] != 0)
+		{
+			labeltable[*nlabels] = labeltable[a]; // Organiza tabela de etiquetas
+			(*nlabels)++;						  // Conta etiquetas
+		}
+	}
+
+	// Se n�o h� blobs
+	if (*nlabels == 0)
+		return NULL;
+
+	// Cria lista de blobs (objectos) e preenche a etiqueta
+	blobs = (OVC *)calloc((*nlabels), sizeof(OVC));
+	if (blobs != NULL)
+	{
+		for (a = 0; a < (*nlabels); a++)
+			blobs[a].label = labeltable[a];
+	}
+	else
+		return NULL;
+
+	return blobs;
+}
+
+int vc_binary_blob_info_trabalho(IVC *src, OVC *blobs, int nblobs)
+{
+	unsigned char *data = (unsigned char *)src->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int x, y, i;
+	long int pos;
+	int xmin, ymin, xmax, ymax;
+	long int sumx, sumy;
+
+	// Verifica��o de erros
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return 0;
+	if (channels != 1)
+		return 0;
+
+	// Conta �rea de cada blob
+	for (i = 0; i < nblobs; i++)
+	{
+		xmin = width - 1;
+		ymin = height - 1;
+		xmax = 0;
+		ymax = 0;
+
+		sumx = 0;
+		sumy = 0;
+
+		blobs[i].area = 0;
+
+		for (y = 1; y < height - 1; y++)
+		{
+			for (x = (1+216); x < (width - 1-216); x++)
+			{
+				pos = y * bytesperline + x * channels;
+
+				if (data[pos] == blobs[i].label)
+				{
+					// �rea
+					blobs[i].area++;
+
+					// Centro de Gravidade
+					sumx += x;
+					sumy += y;
+
+					// Bounding Box
+					if (xmin > x)
+						xmin = x;
+					if (ymin > y)
+						ymin = y;
+					if (xmax < x)
+						xmax = x;
+					if (ymax < y)
+						ymax = y;
+
+					// Per�metro
+					// Se pelo menos um dos quatro vizinhos n�o pertence ao mesmo label, ent�o � um pixel de contorno
+					if ((data[pos - 1] != blobs[i].label) || (data[pos + 1] != blobs[i].label) || (data[pos - bytesperline] != blobs[i].label) || (data[pos + bytesperline] != blobs[i].label))
+					{
+						blobs[i].perimeter++;
+					}
+				}
+			}
+		}
+
+		// Bounding Box
+		blobs[i].x = xmin;
+		blobs[i].y = ymin;
+		blobs[i].width = (xmax - xmin) + 1;
+		blobs[i].height = (ymax - ymin) + 1;
+
+		// Centro de Gravidade
+		// blobs[i].xc = (xmax - xmin) / 2;
+		// blobs[i].yc = (ymax - ymin) / 2;
+		blobs[i].xc = sumx / MY_MAX(blobs[i].area, 1);
+		blobs[i].yc = sumy / MY_MAX(blobs[i].area, 1);
+	}
+
+	return 1;
+}

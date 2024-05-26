@@ -114,8 +114,18 @@ int vc_gray_erode2(IVC *srcdst, int kernel);
 
 int vc_gray_to_rgb(IVC *src, IVC *dst);
 
+/*
+
+			Para Trabalho Final
+
+*/
+
 int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
 int vc_binary_erode_trabalho(IVC *src, IVC *dst, int kernel);
+int vc_binary_dilate_trabalho(IVC *src, IVC *dst, int kernel);
+void combine_segmentations_trabalho(IVC *dst, IVC *src1, IVC *src2);
+OVC *vc_binary_blob_labelling_trabalho(IVC *src, IVC *dst, int *nlabels);
+int vc_binary_blob_info_trabalho(IVC *src, OVC *blobs, int nblobs);
 
 
 
