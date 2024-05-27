@@ -2697,7 +2697,7 @@ OVC *vc_binary_blob_labelling_trabalho(IVC *src, IVC *dst, int *nlabels)
 		datadst[0 * bytesperline + x * channels] = 0;
 		datadst[(height - 1) * bytesperline + x * channels] = 0;
 	}
-
+	label = 1;
 	// Efectua a etiquetagem
 	for (y = 1; y < height - 1; y++)
 	{
@@ -2719,7 +2719,7 @@ OVC *vc_binary_blob_labelling_trabalho(IVC *src, IVC *dst, int *nlabels)
 				if ((datadst[posA] == 0) && (datadst[posB] == 0) && (datadst[posC] == 0) && (datadst[posD] == 0))
 				{
 					datadst[posX] = label;
-					labeltable[label] = label;
+					labeltable[label] = label; // mais do que 256 labels. confições ais restritivas para aceitar uam label.
 					label++;
 				}
 				else
@@ -2888,7 +2888,7 @@ int vc_binary_blob_info_trabalho(IVC *src, OVC *blobs, int nblobs)
 
 		for (y = 1; y < height - 1; y++)
 		{
-			for (x = (1+216); x < (width - 1-216); x++)
+			for (x = (1 + 216); x < (width - 1 - 216); x++)
 			{
 				pos = y * bytesperline + x * channels;
 
@@ -2935,4 +2935,45 @@ int vc_binary_blob_info_trabalho(IVC *src, OVC *blobs, int nblobs)
 	}
 
 	return 1;
+}
+
+void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2) {
+    if (src1->width != src2->width || src1->height != src2->height) {
+        printf("ERROR -> brancoparaoriginal_trabalho():\n\tImages size mismatch!\n");
+        return;
+    }
+
+    if (src1->channels != 1 || src2->channels != 3 || dst->channels != 3) {
+        printf("ERROR -> brancoparaoriginal_trabalho():\n\tChannel number mismatch!\n");
+        return;
+    }
+
+    int start = 217;
+    int end = src1->width - 217;
+
+    for (int y = 0; y < src1->height; y++) {
+        for (int x = 0; x < src1->width; x++) {
+            int posSrc1 = y * src1->bytesperline + x; // Position in the binary image
+            int posSrc2 = y * src2->bytesperline + 3 * x; // Position in the 3-channel image
+
+            if (x >= start && x < end) {
+                if (src1->data[posSrc1] == 255) {
+                    // Set dst pixels to white if src1's corresponding pixel is 255 within specified range
+                    dst->data[posSrc2] = 255;
+                    dst->data[posSrc2 + 1] = 255;
+                    dst->data[posSrc2 + 2] = 255;
+                } else {
+                    // Copy pixel from src2 to dst within specified range
+                    dst->data[posSrc2] = src2->data[posSrc2];
+                    dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
+                    dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
+                }
+            } else {
+                // Copy pixel from src2 to dst outside specified range
+                dst->data[posSrc2] = src2->data[posSrc2];
+                dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
+                dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
+            }
+        }
+    }
 }

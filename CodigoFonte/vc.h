@@ -126,6 +126,7 @@ int vc_binary_dilate_trabalho(IVC *src, IVC *dst, int kernel);
 void combine_segmentations_trabalho(IVC *dst, IVC *src1, IVC *src2);
 OVC *vc_binary_blob_labelling_trabalho(IVC *src, IVC *dst, int *nlabels);
 int vc_binary_blob_info_trabalho(IVC *src, OVC *blobs, int nblobs);
+void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2);
 
 
 

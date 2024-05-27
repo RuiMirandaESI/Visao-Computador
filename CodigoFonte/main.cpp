@@ -88,9 +88,8 @@ int main(void)
 
 	cv::Mat frame;
 
-	
-
 	IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
+	IVC *srcimage2 = vc_image_new(video.width, video.height, 3, 255);
 	// IVC *dstimageGray1channel = vc_image_new(video.width, video.height, 1, 255);
 	//  IVC *dstimageGray3channel = vc_image_new(video.width, video.height, 3, 255);
 	IVC *image = vc_image_new(video.width, video.height, 1, 255);
@@ -102,6 +101,9 @@ int main(void)
 	IVC *image7 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image8 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image9 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image10 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image11 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image12 = vc_image_new(video.width, video.height, 3, 255);
 	
 
 	while (key != 'q')
@@ -146,8 +148,8 @@ int main(void)
 		*/
 		// +++++++++++++
 
-		
 		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
+		memcpy(srcimage2->data, frame.data, video.width * video.height * 3);
 
 		vc_bgr_to_hsv(srcimage);
 		vc_hsv_segmentation_trabalho(srcimage, image, 30, 80, 30, 100, 30, 100);
@@ -160,19 +162,17 @@ int main(void)
 		combine_segmentations_trabalho(image8, image4, image7);
 		combine_segmentations_trabalho(image9, image5, image8);
 		// vc_binary_erode_trabalho(image9, image10, 6);
-		vc_binary_dilate_trabalho(image9, image, 4);
-		vc_binary_dilate_trabalho(image, image2, 3);
-		vc_binary_dilate_trabalho(image2, image3, 3);
 
+		vc_binary_dilate_trabalho(image9, image10, 6);
 
-
+		
 		int nblobs, i;
 		OVC *blobs;
-		blobs = vc_binary_blob_labelling_trabalho(image3, image4, &nblobs);
+		blobs = vc_binary_blob_labelling_trabalho(image10, image11, &nblobs);
 		if (blobs != NULL)
 		{
 
-			vc_binary_blob_info_trabalho(image4, blobs, nblobs);
+			vc_binary_blob_info_trabalho(image11, blobs, nblobs);
 
 			printf("\nNumber of labels: %d\n", nblobs);
 
@@ -181,36 +181,38 @@ int main(void)
 
 				if (blobs[i].area > 5000)
 				{
-					vc_draw_centerofgravity(image4, &blobs[i], 1, 3);
-					vc_draw_boundingbox(image4, &blobs[i], 1);
+					vc_draw_centerofgravity(image11, &blobs[i], 1, 3);
+					vc_draw_boundingbox(image11, &blobs[i], 1);
 					printf("\nArea of labels: %d\n", blobs[i].area);
 				}
 			}
-
-			free(blobs);
+		free(blobs);
+		
 		}
+
+		brancoparaoriginal_trabalho(image12, image11, srcimage2);
+		
 
 		
 		// Para correr imagem final com 3 channels
 
-		/*
-		vc_gray_to_rgb(image, srcimage);
-		memcpy(frame.data, srcimage->data, video.width * video.height * 3);
-		cv::imshow("VC - VIDEO", frame);*/
+		
+		//vc_gray_to_rgb(image11, image12);
+		memcpy(frame.data, image12->data, video.width * video.height * 3);
+		cv::imshow("VC - VIDEO", frame);
 
 		// Para correr imagem final com 1 channel
 
-		cv::Mat grayMat = IVC_to_Mat1Channel(image4);
-		cv::imshow("VC - VIDEO", grayMat);
+		/*
+		cv::Mat grayMat = IVC_to_Mat1Channel(image12);
+		cv::imshow("VC - VIDEO", grayMat);*/
 
 		/* Sai da aplica��o, se o utilizador premir a tecla 'q' */
 		key = cv::waitKey(1);
 	}
 
-	
-	
 	vc_image_free(srcimage);
-	
+	vc_image_free(srcimage2);
 	vc_image_free(image);
 	vc_image_free(image2);
 	vc_image_free(image3);
@@ -220,10 +222,10 @@ int main(void)
 	vc_image_free(image7);
 	vc_image_free(image8);
 	vc_image_free(image9);
+	vc_image_free(image10);
+	vc_image_free(image11);
+	vc_image_free(image12);
 	
-
-	// vc_image_free(dstimageGray1channel);
-	//  vc_image_free(dstimageGray3channel);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
