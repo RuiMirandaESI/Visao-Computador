@@ -90,23 +90,21 @@ int main(void)
 
 	IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
 	IVC *srcimage2 = vc_image_new(video.width, video.height, 3, 255);
-	// IVC *dstimageGray1channel = vc_image_new(video.width, video.height, 1, 255);
-	//  IVC *dstimageGray3channel = vc_image_new(video.width, video.height, 3, 255);
-	IVC *image = vc_image_new(video.width, video.height, 1, 255);
+	/*IVC *image = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image2 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image4 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image5 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image6 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image7 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image8 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image8 = vc_image_new(video.width, video.height, 1, 255);*/
 	IVC *image9 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image10 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image11 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image12 = vc_image_new(video.width, video.height, 3, 255);
-	IVC *image13 = vc_image_new(video.width, video.height, 1, 255);
+	/*IVC *image13 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image14 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image15 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image15 = vc_image_new(video.width, video.height, 1, 255);*/
 	IVC *image16 = vc_image_new(video.width, video.height, 1, 255);
 
 	while (key != 'q')
@@ -154,11 +152,11 @@ int main(void)
 		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
 		memcpy(srcimage2->data, frame.data, video.width * video.height * 3);
 
-		if (video.nframe < 696)
+		if ((video.nframe < 696 && !(video.nframe >= 110 && video.nframe <= 125) && !(video.nframe >= 455 && video.nframe <= 490)))
 		{
 
 			vc_bgr_to_hsv(srcimage);
-			vc_hsv_segmentation_trabalho(srcimage, image, 30, 80, 30, 100, 30, 100);
+			/*vc_hsv_segmentation_trabalho(srcimage, image, 30, 80, 30, 100, 30, 100);
 			vc_hsv_segmentation_trabalho(srcimage, image2, 0, 360, 0, 40, 0, 40);	 // preto
 			vc_hsv_segmentation_trabalho(srcimage, image3, 0, 15, 50, 100, 50, 100); // vermelho
 			vc_hsv_segmentation_trabalho(srcimage, image4, 340, 360, 50, 100, 50, 100);
@@ -168,10 +166,11 @@ int main(void)
 			combine_segmentations_trabalho(image7, image3, image6);
 			combine_segmentations_trabalho(image8, image4, image7);
 			combine_segmentations_trabalho(image14, image13, image8);
-			combine_segmentations_trabalho(image9, image5, image14);
+			combine_segmentations_trabalho(image9, image5, image14);*/
+			vc_hsv_segmentation_trabalho_completo(srcimage, image9);
 			// vc_binary_erode_trabalho(image9, image10, 6);
 
-			vc_binary_dilate_trabalho(image9, image16, 6);
+			vc_binary_dilate_trabalho(image9, image16, 7);
 			// vc_binary_dilate_trabalho(image15, image10, 6);
 			vc_binary_erode_trabalho(image16, image10, 7);
 
@@ -199,6 +198,8 @@ int main(void)
 			}
 
 			brancoparaoriginal_trabalho(image12, image11, srcimage2);
+
+			printf("\nFPS atual: %d\n", video.nframe);
 
 			
 
@@ -233,21 +234,21 @@ int main(void)
 
 	vc_image_free(srcimage);
 	vc_image_free(srcimage2);
-	vc_image_free(image);
+	/*vc_image_free(image);
 	vc_image_free(image2);
 	vc_image_free(image3);
 	vc_image_free(image4);
 	vc_image_free(image5);
 	vc_image_free(image6);
 	vc_image_free(image7);
-	vc_image_free(image8);
+	vc_image_free(image8);*/
 	vc_image_free(image9);
 	vc_image_free(image10);
 	vc_image_free(image11);
 	vc_image_free(image12);
-	vc_image_free(image13);
+	/*vc_image_free(image13);
 	vc_image_free(image14);
-	vc_image_free(image15);
+	vc_image_free(image15);*/
 	vc_image_free(image16);
 
 	/* Para o timer e exibe o tempo decorrido */

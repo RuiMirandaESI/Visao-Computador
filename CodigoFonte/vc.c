@@ -2977,3 +2977,52 @@ void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2) {
         }
     }
 }
+
+int vc_hsv_segmentation_trabalho_completo(IVC *src, IVC *dst)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	int byterperline_src = src->width * src->channels;
+	int channels_src = src->channels;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int bytesperline_dst = dst->width * dst->channels;
+	int channels_dst = dst->channels;
+	int width = src->width;
+	int height = src->height;
+	int x, y;
+	long int pos_src, pos_dst;
+	float h, s, v;
+
+	if (src->width <= 0 || src->height <= 0 || src->data == NULL)
+		return 0;
+	if (src->width != dst->width || src->height != dst->height)
+		return 0;
+	if (src->channels != 3 || dst->channels != 1)
+		return 0;
+
+	// Segmentation loop
+	for (y = 0; y < height; y++)
+	{
+		for (x = 216; x < (width - 216); x++)
+		{
+			pos_src = y * byterperline_src + x * channels_src;
+			pos_dst = y * bytesperline_dst + x * channels_dst;
+
+			// Assuming HSV values are stored in src and are normalized [0, 255]
+			h = (int)(((float)datasrc[pos_src]) / 255.0f * 360.0f);
+			s = (int)(((float)datasrc[pos_src + 1]) / 255.0f * 100.0f);
+			v = (int)(((float)datasrc[pos_src + 2]) / 255.0f * 100.0f);
+
+			// Check if the pixel falls within the specified HSV range
+			if ((h >= 30 && h <= 80 && s >= 30 && s <= 100 && v >= 30 && v <= 100) || (h >= 0 && h <= 360 && s >= 0 && s <= 40 && v >= 0 && v <= 40) || (h >= 0 && h <= 15 && s >= 50 && s <= 100 && v >= 50 && v <= 100) || (h >= 340 && h <= 360 && s >= 50 && s <= 100 && v >= 50 && v <= 100) || (h >= 100 && h <= 270 && s >= 30 && s <= 100 && v >= 30 && v <= 100) || (h >= 0 && h <= 30 && s >= 30 && s <= 60 && v >= 30 && v <= 60))
+			{
+				datadst[pos_dst] = 255; // Pixel is within range, mark as white
+			}
+			else
+			{
+				datadst[pos_dst] = 0; // Pixel is outside range, mark as black
+			}
+		}
+	}
+
+	return 1; // Success
+}
