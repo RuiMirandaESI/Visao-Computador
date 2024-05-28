@@ -89,11 +89,23 @@ int main(void)
 	cv::Mat frame;
 
 	IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
-	IVC *dstimageGray1channel = vc_image_new(video.width, video.height, 1, 255);
-	//IVC *dstimageGray3channel = vc_image_new(video.width, video.height, 3, 255);
-	IVC *image = vc_image_new(video.width, video.height, 1, 255);
-	//IVC *image2 = vc_image_new(video.width, video.height, 1, 255);
-	//IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *srcimage2 = vc_image_new(video.width, video.height, 3, 255);
+	/*IVC *image = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image2 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image4 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image5 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image6 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image7 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image8 = vc_image_new(video.width, video.height, 1, 255);*/
+	IVC *image9 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image10 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image11 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image12 = vc_image_new(video.width, video.height, 3, 255);
+	/*IVC *image13 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image14 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image15 = vc_image_new(video.width, video.height, 1, 255);*/
+	IVC *image16 = vc_image_new(video.width, video.height, 1, 255);
 
 	while (key != 'q')
 	{
@@ -108,6 +120,7 @@ int main(void)
 		video.nframe = (int)capture.get(cv::CAP_PROP_POS_FRAMES);
 
 		/* Exemplo de inser��o texto na frame */
+		/*
 		str = std::string("RESOLUCAO: ").append(std::to_string(video.width)).append("x").append(std::to_string(video.height));
 		cv::putText(frame, str, cv::Point(20, 25), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
 		cv::putText(frame, str, cv::Point(20, 25), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
@@ -119,7 +132,7 @@ int main(void)
 		cv::putText(frame, str, cv::Point(20, 75), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
 		str = std::string("N. DA FRAME: ").append(std::to_string(video.nframe));
 		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
-		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
+		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);*/
 
 		// Faça o seu código aqui...
 		/*
@@ -137,56 +150,106 @@ int main(void)
 		// +++++++++++++
 
 		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
+		memcpy(srcimage2->data, frame.data, video.width * video.height * 3);
 
-		vc_bgr_to_hsv(srcimage);
-		vc_hsv_segmentation(srcimage, dstimageGray1channel, 30, 80, 30, 100, 30, 100);
-		vc_binary_erode(dstimageGray1channel, image, 3);
-		//vc_binary_dilate(image, dstimageGray1channel, 30);
-		
-		
-		/*int nblobs, i;
-		OVC *blobs;
-		blobs = vc_binary_blob_labelling(dstimageGray1channel, image, &nblobs);
-		if (blobs != NULL)
+		if ((video.nframe < 696 && !(video.nframe >= 110 && video.nframe <= 125) && !(video.nframe >= 455 && video.nframe <= 490)))
 		{
 
-			vc_binary_blob_info(image, blobs, nblobs);
+			vc_bgr_to_hsv(srcimage);
+			/*vc_hsv_segmentation_trabalho(srcimage, image, 30, 80, 30, 100, 30, 100);
+			vc_hsv_segmentation_trabalho(srcimage, image2, 0, 360, 0, 40, 0, 40);	 // preto
+			vc_hsv_segmentation_trabalho(srcimage, image3, 0, 15, 50, 100, 50, 100); // vermelho
+			vc_hsv_segmentation_trabalho(srcimage, image4, 340, 360, 50, 100, 50, 100);
+			vc_hsv_segmentation_trabalho(srcimage, image5, 100, 270, 30, 100, 30, 100); // verde e azul
+			vc_hsv_segmentation_trabalho(srcimage, image13, 0, 30, 30, 60, 30, 60);		// castanho
+			combine_segmentations_trabalho(image6, image2, image);
+			combine_segmentations_trabalho(image7, image3, image6);
+			combine_segmentations_trabalho(image8, image4, image7);
+			combine_segmentations_trabalho(image14, image13, image8);
+			combine_segmentations_trabalho(image9, image5, image14);*/
+			vc_hsv_segmentation_trabalho_completo(srcimage, image9);
+			// vc_binary_erode_trabalho(image9, image10, 6);
 
-			printf("\nNumber of labels: %d\n", nblobs);
+			vc_binary_dilate_trabalho(image9, image16, 7);
+			// vc_binary_dilate_trabalho(image15, image10, 6);
+			vc_binary_erode_trabalho(image16, image10, 7);
+
+			int nblobs, i;
+			OVC *blobs;
+			blobs = vc_binary_blob_labelling_trabalho(image10, image11, &nblobs);
+			if (blobs != NULL)
+			{
+
+				vc_binary_blob_info_trabalho(image11, blobs, nblobs);
+
+				printf("\nNumber of labels: %d\n", nblobs);
+
+				for (i = 0; i < nblobs; i++)
+				{
+
+					if (blobs[i].area > 5000)
+					{
+						vc_draw_centerofgravity(image11, &blobs[i], 1, 3);
+						vc_draw_boundingbox(image11, &blobs[i], 1);
+						printf("\nArea of labels: %d\n", blobs[i].area);
+					}
+				}
+				free(blobs);
+			}
+
+			brancoparaoriginal_trabalho(image12, image11, srcimage2);
+
+			printf("\nFPS atual: %d\n", video.nframe);
+
 			
-			vc_draw_centerofgravity(image, blobs, nblobs, 3);
-			vc_draw_boundingbox(image, blobs, nblobs);
 
-			free(blobs);
-		}*/
+			// Para correr imagem final com 3 channels
 
-		
-		
-		/*
-		//Para correr imagem final com 3 channels
-		vc_gray_to_rgb(image, srcimage);
-		memcpy(frame.data, srcimage->data, video.width * video.height * 3);
-		cv::imshow("VC - VIDEO", frame);*/
-		
-		
+			// vc_gray_to_rgb(image11, image12);
+			// memcpy(frame.data, image12->data, video.width * video.height * 3);
+			// cv::imshow("VC - VIDEO", frame);
 
-		
-		
-		//Para correr imagem final com 1 channel
-		cv::Mat grayMat = IVC_to_Mat1Channel(image);
-		cv::imshow("VC - VIDEO", grayMat);
-		
+			// Para correr imagem final com 1 channel
 
-		/* Sai da aplica��o, se o utilizador premir a tecla 'q' */
+			//cv::Mat grayMat = IVC_to_Mat1Channel(image10);
+			//cv::imshow("VC - VIDEO", grayMat);
+
+			memcpy(frame.data, image12->data, video.width * video.height * 3);
+			cv::imshow("VC - VIDEO", frame);
+
+			/* Sai da aplica��o, se o utilizador premir a tecla 'q' */
+			
+		}
+		
+		else
+		{
+			memcpy(frame.data, srcimage2->data, video.width * video.height * 3);
+			cv::imshow("VC - VIDEO", frame);
+			
+			
+		}
+
 		key = cv::waitKey(1);
 	}
 
 	vc_image_free(srcimage);
-	vc_image_free(dstimageGray1channel);
-	//vc_image_free(dstimageGray3channel);
-	vc_image_free(image);
-	//vc_image_free(image2);
-	//vc_image_free(image3);
+	vc_image_free(srcimage2);
+	/*vc_image_free(image);
+	vc_image_free(image2);
+	vc_image_free(image3);
+	vc_image_free(image4);
+	vc_image_free(image5);
+	vc_image_free(image6);
+	vc_image_free(image7);
+	vc_image_free(image8);*/
+	vc_image_free(image9);
+	vc_image_free(image10);
+	vc_image_free(image11);
+	vc_image_free(image12);
+	/*vc_image_free(image13);
+	vc_image_free(image14);
+	vc_image_free(image15);*/
+	vc_image_free(image16);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
