@@ -108,6 +108,15 @@ int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, in
 
 int vc_bgr_to_hsv(IVC *srcdst);
 
+OVC* vc_binary_blob_labelling2(IVC *srcdst, int *nlabels);
+
+int vc_gray_erode2(IVC *srcdst, int kernel);
+
+int vc_gray_to_rgb(IVC *src, IVC *dst);
+
+int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
+int vc_binary_erode_trabalho(IVC *src, IVC *dst, int kernel);
+
 
 
 
