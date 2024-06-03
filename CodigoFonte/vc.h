@@ -131,4 +131,8 @@ int vc_hsv_segmentation_trabalho_completo(IVC *src, IVC *dst);
 
 
 
+int vc_hsv_segmentation_resistencia(IVC *src, IVC *dst);
+
+
+
 

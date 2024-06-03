@@ -90,10 +90,10 @@ int main(void)
 
 	IVC *image = vc_image_new(video.width, video.height, 3, 255);
 	IVC *image2 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image3 = vc_image_new(video.width, video.height, 3, 255);
-	IVC *image4 = vc_image_new(video.width, video.height, 3, 255);
-	/*IVC *image5 = vc_image_new(video.width, video.height, 3, 255);
-	IVC *image6 = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
+	//IVC *image4 = vc_image_new(video.width, video.height, 1, 255);
+	//IVC *image5 = vc_image_new(video.width, video.height, 1, 255);
+	/*IVC *image6 = vc_image_new(video.width, video.height, 3, 255);
 	IVC *image7 = vc_image_new(video.width, video.height, 3, 255);
 	IVC *image8 = vc_image_new(video.width, video.height, 3, 255);
 	IVC *image9 = vc_image_new(video.width, video.height, 3, 255);
@@ -135,11 +135,13 @@ int main(void)
 		vc_bgr_to_hsv(image);
 
 		// corpo resistencias
-		vc_hsv_segmentation(image, image2, 29, 46, 31, 62, 54, 91);
-		vc_hsv_segmentation(image, image3, 29, 38, 33, 46, 46, 56);
-		combine_segmentations(image4, image2, image3);
+		//vc_hsv_segmentation(image, image2, 29, 46, 31, 62, 54, 91);
+		//vc_hsv_segmentation(image, image3, 29, 38, 33, 46, 46, 56);
+		//combine_segmentations(image4, image2, image3);
+		vc_hsv_segmentation_resistencia(image, image2);
+		
 
-		cv::Mat grayMat = IVC_to_Mat1Channel(image4);
+		cv::Mat grayMat = IVC_to_Mat1Channel(image2);
 		cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
@@ -147,8 +149,9 @@ int main(void)
 
 	vc_image_free(image);
 	vc_image_free(image2);
-	vc_image_free(image3);
-	vc_image_free(image4);
+	//vc_image_free(image3);
+	//vc_image_free(image4);
+	//vc_image_free(image5);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
