@@ -90,28 +90,31 @@ int main(void)
 
 	IVC *image = vc_image_new(video.width, video.height, 3, 255);
 	IVC *image2 = vc_image_new(video.width, video.height, 1, 255);
-	//IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
-	//IVC *image4 = vc_image_new(video.width, video.height, 1, 255);
-	//IVC *image5 = vc_image_new(video.width, video.height, 1, 255);
-	/*IVC *image6 = vc_image_new(video.width, video.height, 3, 255);
-	IVC *image7 = vc_image_new(video.width, video.height, 3, 255);
-	IVC *image8 = vc_image_new(video.width, video.height, 3, 255);
-	IVC *image9 = vc_image_new(video.width, video.height, 3, 255);
+	IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image4 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image5 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image6 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image7 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image8 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *imageFinal = vc_image_new(video.width, video.height, 1, 255);
+	IVC *coresResistenciaJuntas = vc_image_new(video.width, video.height, 1, 255);
+	//IVC *image9 = vc_image_new(video.width, video.height, 3, 255);
 
-	IVC *imageRGB = vc_image_new(image->width, image->height, 3, image->levels);
-	IVC *dilatarimagem = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imagemFinal = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imagemFinalAux = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imageVerde = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imageAzul = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imagePreto = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imageVermelho = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imageCastanho = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imagemCoresFinal = vc_image_new(video.width, video.height, 3, 255);
-	IVC *auxBlobSegmentation = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imageLaranja = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imagemBoundingBox = vc_image_new(video.width, video.height, 3, 255);
-	IVC *resistenciasJuntas = vc_image_new(video.width, video.height, 1, 255);*/
+	
+	//IVC *imageRGB = vc_image_new(image->width, image->height, 3, image->levels);
+	//IVC *dilatarimagem = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imagemFinal = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imagemFinalAux = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imageVerde = vc_image_new(video.width, video.height, 1, 255);
+	//IVC *imageAzul = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imagePreto = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imageVermelho = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imageCastanho = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imagemCoresFinal = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *auxBlobSegmentation = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imageLaranja = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *imagemBoundingBox = vc_image_new(video.width, video.height, 3, 255);
+	//IVC *resistenciasJuntas = vc_image_new(video.width, video.height, 1, 255);
 
 	/*OVC *arrayVerde[6] = {NULL}, *arrayPreto[6] = {NULL}, *arrayVermelho[6] = {NULL}, *arrayAzul[6] = {NULL}, *arrayCastanho[6] = {NULL}, *arrayResistencia[6] = {NULL}, *arrayLaranja[6] = {NULL};
 	OVC *blobSegmentation = NULL, *blobVerde = NULL, *blobPreto = NULL, *blobVermelho = NULL, *blobAzul = NULL, *blobCastanho = NULL, *blobCoresJuntas = NULL, *blobLaranja = NULL;
@@ -138,10 +141,39 @@ int main(void)
 		//vc_hsv_segmentation(image, image2, 29, 46, 31, 62, 54, 91);
 		//vc_hsv_segmentation(image, image3, 29, 38, 33, 46, 46, 56);
 		//combine_segmentations(image4, image2, image3);
-		vc_hsv_segmentation_resistencia(image, image2);
+		vc_hsv_segmentation_resistencia_corpo(image, image2);
+
+		//verde
+		vc_hsv_segmentation(image, image3, 79, 105, 28, 45, 35, 50);
+
+		//azul
+		vc_hsv_segmentation(image, image4, 155, 200, 16, 40, 36, 52);
+
+		//vermelha
+		//vc_hsv_segmentation(image, image2, 0, 11, 45, 69, 55, 89);
+		//vc_hsv_segmentation(image, image3, 354, 360, 45, 75, 55, 75);
+		//combine_segmentations(image4, image2, image3);
+		vc_hsv_segmentation_vermelho(image, image5);
+
+		//castanho
+		//vc_hsv_segmentation(image, image2, 12, 28, 25, 44, 31, 49);
+		//vc_hsv_segmentation(image, image3, 11, 23, 42, 58, 41, 58);
+		vc_hsv_segmentation_castanho(image, image6);
+
+		//preto
+		vc_hsv_segmentation(image, image7, 35, 200, 3, 19, 15, 37);
+
+		//laranja
+		vc_hsv_segmentation(image, image8, 6, 12, 68, 78, 80, 92);
+
+		//final e resistencias
+		vc_hsv_segmentation_final(image, imageFinal);
+		vc_hsv_segmentation_resistencias(image, coresResistenciaJuntas);
+
+
 		
 
-		cv::Mat grayMat = IVC_to_Mat1Channel(image2);
+		cv::Mat grayMat = IVC_to_Mat1Channel(imageFinal);
 		cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
@@ -149,9 +181,14 @@ int main(void)
 
 	vc_image_free(image);
 	vc_image_free(image2);
-	//vc_image_free(image3);
-	//vc_image_free(image4);
-	//vc_image_free(image5);
+	vc_image_free(image3);
+	vc_image_free(image4);
+	vc_image_free(image5);
+	vc_image_free(image6);
+	vc_image_free(image7);
+	vc_image_free(image8);
+	vc_image_free(coresResistenciaJuntas);
+	vc_image_free(imageFinal);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
