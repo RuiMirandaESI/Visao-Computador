@@ -127,6 +127,9 @@ int main(void)
 	OVC *blobAzul;
 	OVC *arrayAzul[6];
 
+	int nblobs, i;
+	OVC *blobs;
+
 	/*OVC *arrayVerde[6] = {NULL}, *arrayPreto[6] = {NULL}, *arrayVermelho[6] = {NULL}, *arrayAzul[6] = {NULL}, *arrayCastanho[6] = {NULL}, *arrayResistencia[6] = {NULL}, *arrayLaranja[6] = {NULL};
 	OVC *blobSegmentation = NULL, *blobVerde = NULL, *blobPreto = NULL, *blobVermelho = NULL, *blobAzul = NULL, *blobCastanho = NULL, *blobCoresJuntas = NULL, *blobLaranja = NULL;
 	*/
@@ -220,8 +223,6 @@ int main(void)
 
 		vc_binary_dilate(imageFinal, cenas, 7);
 
-		int nblobs, i;
-		OVC *blobs;
 		blobs = vc_binary_blob_labelling(cenas, cenas2, &nblobs);
 		if (blobs != NULL)
 		{
@@ -235,7 +236,7 @@ int main(void)
 
 				if (blobs[i].area >= 6900)
 				{
-					//vc_draw_centerofgravity(cenas2, &blobs[i], 1, 3);
+					// vc_draw_centerofgravity(cenas2, &blobs[i], 1, 3);
 					vc_draw_boundingbox(cenas2, &blobs[i], 1);
 					printf("\nArea of labels: %d\n", blobs[i].area);
 				}
