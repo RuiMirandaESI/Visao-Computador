@@ -98,6 +98,8 @@ int main(void)
 	IVC *image8 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *imageFinal = vc_image_new(video.width, video.height, 1, 255);
 	IVC *coresResistenciaJuntas = vc_image_new(video.width, video.height, 1, 255);
+	IVC *cenas = vc_image_new(video.width, video.height, 1, 255);
+	IVC *cenas2 = vc_image_new(video.width, video.height, 1, 255);
 	// IVC *image9 = vc_image_new(video.width, video.height, 3, 255);
 
 	// IVC *imageRGB = vc_image_new(image->width, image->height, 3, image->levels);
@@ -115,16 +117,15 @@ int main(void)
 	// IVC *imagemBoundingBox = vc_image_new(video.width, video.height, 3, 255);
 	// IVC *resistenciasJuntas = vc_image_new(video.width, video.height, 1, 255);
 
-	//Para o verde
+	// Para o verde
 	int nBlobsSegVerde, iteradorVerde;
 	OVC *blobVerde;
 	OVC *arrayVerde[6];
 
-	//Para o azul
+	// Para o azul
 	int nBlobsSegAzul, iteradorAzul;
 	OVC *blobAzul;
 	OVC *arrayAzul[6];
-
 
 	/*OVC *arrayVerde[6] = {NULL}, *arrayPreto[6] = {NULL}, *arrayVermelho[6] = {NULL}, *arrayAzul[6] = {NULL}, *arrayCastanho[6] = {NULL}, *arrayResistencia[6] = {NULL}, *arrayLaranja[6] = {NULL};
 	OVC *blobSegmentation = NULL, *blobVerde = NULL, *blobPreto = NULL, *blobVermelho = NULL, *blobAzul = NULL, *blobCastanho = NULL, *blobCoresJuntas = NULL, *blobLaranja = NULL;
@@ -185,7 +186,7 @@ int main(void)
 			vc_binary_blob_info(imageAzul, blobAzul, nBlobsSegAzul);
 			for (int i = 0; i < nBlobsSegAzul; i++)
 			{
-				
+
 				if (blobAzul[i].area >= 90 && blobAzul[i].area <= 1000)
 				{
 					arrayAzul[iteradorAzul] = (OVC *)malloc(sizeof(OVC));
@@ -214,9 +215,35 @@ int main(void)
 
 		// final e resistencias
 		vc_hsv_segmentation_final(image, imageFinal);
+
 		vc_hsv_segmentation_resistencias(image, coresResistenciaJuntas);
 
-		cv::Mat grayMat = IVC_to_Mat1Channel(imageFinal);
+		vc_binary_dilate(imageFinal, cenas, 7);
+
+		int nblobs, i;
+		OVC *blobs;
+		blobs = vc_binary_blob_labelling(cenas, cenas2, &nblobs);
+		if (blobs != NULL)
+		{
+
+			vc_binary_blob_info(cenas2, blobs, nblobs);
+
+			printf("\nNumber of labels: %d\n", nblobs);
+
+			for (i = 0; i < nblobs; i++)
+			{
+
+				if (blobs[i].area >= 6900)
+				{
+					//vc_draw_centerofgravity(cenas2, &blobs[i], 1, 3);
+					vc_draw_boundingbox(cenas2, &blobs[i], 1);
+					printf("\nArea of labels: %d\n", blobs[i].area);
+				}
+			}
+			free(blobs);
+		}
+
+		cv::Mat grayMat = IVC_to_Mat1Channel(cenas2);
 		cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
@@ -232,6 +259,8 @@ int main(void)
 	vc_image_free(image8);
 	vc_image_free(coresResistenciaJuntas);
 	vc_image_free(imageFinal);
+	vc_image_free(cenas);
+	vc_image_free(cenas2);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
