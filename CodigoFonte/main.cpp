@@ -100,6 +100,8 @@ int main(void)
 	IVC *coresResistenciaJuntas = vc_image_new(video.width, video.height, 1, 255);
 	IVC *cenas = vc_image_new(video.width, video.height, 1, 255);
 	IVC *cenas2 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *imagesrc = vc_image_new(video.width, video.height, 3, 255);
+	IVC *imagemfinal = vc_image_new(video.width, video.height, 3, 255);
 	// IVC *image9 = vc_image_new(video.width, video.height, 3, 255);
 
 	// IVC *imageRGB = vc_image_new(image->width, image->height, 3, image->levels);
@@ -148,6 +150,7 @@ int main(void)
 		video.nframe = (int)capture.get(cv::CAP_PROP_POS_FRAMES);
 
 		memcpy(image->data, frame.data, video.width * video.height * 3);
+		memcpy(imagesrc->data, frame.data, video.width * video.height * 3);
 
 		vc_bgr_to_hsv(image);
 
@@ -229,14 +232,12 @@ int main(void)
 
 			vc_binary_blob_info(cenas2, blobs, nblobs);
 
-			printf("\nNumber of labels: %d\n", nblobs);
-
 			for (i = 0; i < nblobs; i++)
 			{
 
 				if (blobs[i].area >= 6900)
 				{
-					// vc_draw_centerofgravity(cenas2, &blobs[i], 1, 3);
+					vc_draw_centerofgravity(cenas2, &blobs[i], 1, 3);
 					vc_draw_boundingbox(cenas2, &blobs[i], 1);
 					printf("\nArea of labels: %d\n", blobs[i].area);
 				}
@@ -244,8 +245,13 @@ int main(void)
 			free(blobs);
 		}
 
-		cv::Mat grayMat = IVC_to_Mat1Channel(cenas2);
-		cv::imshow("VC - VIDEO", grayMat);
+		brancoparaoriginal_trabalho(imagemfinal, cenas2, imagesrc);
+
+		memcpy(frame.data, imagemfinal->data, video.width * video.height * 3);
+		cv::imshow("VC - VIDEO", frame);
+
+		//cv::Mat grayMat = IVC_to_Mat1Channel(cenas2);
+		//cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
 	}
@@ -262,6 +268,8 @@ int main(void)
 	vc_image_free(imageFinal);
 	vc_image_free(cenas);
 	vc_image_free(cenas2);
+	vc_image_free(imagesrc);
+	vc_image_free(imagemfinal);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
