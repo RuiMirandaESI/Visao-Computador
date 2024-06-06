@@ -3313,7 +3313,7 @@ void lookForWhite(IVC *src, int yc, int *widths)
 				{
 					widths[count++] = x + 4;
 				}
-				
+
 				state = 1;
 			}
 		}
@@ -3332,9 +3332,11 @@ void lookForWhite(IVC *src, int yc, int *widths)
 				{
 					widths[count++] = x + 4;
 				}
-				
+
 				state = 1;
 			}
 		}
 	}
 }
+
+

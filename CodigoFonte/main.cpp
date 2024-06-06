@@ -105,6 +105,12 @@ int main(void)
 	IVC *image9 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image10 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *wow = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image11 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image12 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image13 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image14 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image15 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image16 = vc_image_new(video.width, video.height, 1, 255);
 
 	// IVC *imageRGB = vc_image_new(image->width, image->height, 3, image->levels);
 	// IVC *dilatarimagem = vc_image_new(video.width, video.height, 3, 255);
@@ -268,26 +274,6 @@ int main(void)
 					{
 						totalResistorCount++;
 
-						// verde
-
-						// vc_hsv_segmentation(image, imageVerde, 79, 105, 28, 45, 35, 50);
-
-						// azul
-
-						// vc_hsv_segmentation(image, image4, 155, 200, 16, 40, 36, 52);
-
-						// vc_hsv_segmentation_vermelho(image, imageVerde);
-
-						// vc_hsv_segmentation_castanho(image, image6);
-
-						// preto
-
-						// vc_hsv_segmentation(image, image7, 35, 200, 3, 19, 15, 37);
-
-						// laranja
-
-						// vc_hsv_segmentation(image, image8, 6, 12, 68, 78, 80, 92);
-
 						vc_hsv_segmentation_resistencias(image, imageVerde);
 
 						cv::Mat imageVerdecena = IVC_to_Mat1Channel(imageVerde);
@@ -307,10 +293,19 @@ int main(void)
 						{
 							printf("Width %d: %d\n", j + 1, widths[j]);
 
+							vc_hsv_segmentation(image, image10, 79, 105, 28, 45, 35, 50);
+
+							vc_hsv_segmentation(image, image11, 155, 200, 16, 40, 36, 52);
+
+							vc_hsv_segmentation_vermelho(image, image12);
+
+							vc_hsv_segmentation_castanho(image, image13);
+
+							vc_hsv_segmentation(image, image14, 35, 200, 3, 19, 15, 37);
+
+							vc_hsv_segmentation(image, image15, 6, 12, 68, 78, 80, 92);
+
 							
-
-
-
 						}
 					}
 				}
@@ -348,6 +343,14 @@ int main(void)
 	vc_image_free(image6);
 	vc_image_free(image7);
 	vc_image_free(image8);
+	vc_image_free(image9);
+	vc_image_free(image10);
+	vc_image_free(image11);
+	vc_image_free(image12);
+	vc_image_free(image13);
+	vc_image_free(image14);
+	vc_image_free(image15);
+	vc_image_free(image16);
 	vc_image_free(coresResistenciaJuntas);
 	vc_image_free(imageFinal);
 	vc_image_free(cenas);
