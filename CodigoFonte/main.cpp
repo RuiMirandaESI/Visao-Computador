@@ -102,7 +102,9 @@ int main(void)
 	IVC *cenas2 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *imagesrc = vc_image_new(video.width, video.height, 3, 255);
 	IVC *imagemfinal = vc_image_new(video.width, video.height, 3, 255);
-	// IVC *image9 = vc_image_new(video.width, video.height, 3, 255);
+	IVC *image9 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image10 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *wow = vc_image_new(video.width, video.height, 1, 255);
 
 	// IVC *imageRGB = vc_image_new(image->width, image->height, 3, image->levels);
 	// IVC *dilatarimagem = vc_image_new(video.width, video.height, 3, 255);
@@ -132,12 +134,14 @@ int main(void)
 	int nblobs, i;
 	OVC *blobs;
 
+	int nblobs2;
+	OVC *blobs2;
+
 	/*OVC *arrayVerde[6] = {NULL}, *arrayPreto[6] = {NULL}, *arrayVermelho[6] = {NULL}, *arrayAzul[6] = {NULL}, *arrayCastanho[6] = {NULL}, *arrayResistencia[6] = {NULL}, *arrayLaranja[6] = {NULL};
 	OVC *blobSegmentation = NULL, *blobVerde = NULL, *blobPreto = NULL, *blobVermelho = NULL, *blobAzul = NULL, *blobCastanho = NULL, *blobCoresJuntas = NULL, *blobLaranja = NULL;
 	*/
 
 	int totalResistorCount = 0;
-	bool countingResistors = false;
 
 	while (key != 'q')
 	{
@@ -263,14 +267,58 @@ int main(void)
 					if (blobs[i].yc >= 100 && blobs[i].yc < 108)
 					{
 						totalResistorCount++;
+
+						// verde
+
+						// vc_hsv_segmentation(image, imageVerde, 79, 105, 28, 45, 35, 50);
+
+						// azul
+
+						// vc_hsv_segmentation(image, image4, 155, 200, 16, 40, 36, 52);
+
+						// vc_hsv_segmentation_vermelho(image, imageVerde);
+
+						// vc_hsv_segmentation_castanho(image, image6);
+
+						// preto
+
+						// vc_hsv_segmentation(image, image7, 35, 200, 3, 19, 15, 37);
+
+						// laranja
+
+						// vc_hsv_segmentation(image, image8, 6, 12, 68, 78, 80, 92);
+
+						vc_hsv_segmentation_resistencias(image, imageVerde);
+
+						cv::Mat imageVerdecena = IVC_to_Mat1Channel(imageVerde);
+						cv::Mat cenasMat2;
+
+						int kernelSize2 = 8;
+						cv::Mat kernel2 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize2, kernelSize2));
+						cv::dilate(imageVerdecena, cenasMat2, kernel2);
+
+						memcpy(wow->data, cenasMat2.data, video.width * video.height);
+
+						int widths[3] = {0, 0, 0};
+
+						lookForWhite(wow, blobs[i].yc, widths);
+
+						for (int j = 0; j < 3; j++)
+						{
+							printf("Width %d: %d\n", j + 1, widths[j]);
+
+							
+
+
+
+						}
 					}
 				}
 			}
 			free(blobs);
-			
 		}
 
-		brancoparaoriginal_trabalho(imagemfinal, cenas2, imagesrc);
+		/*brancoparaoriginal_trabalho(imagemfinal, cenas2, imagesrc);
 		memcpy(frame.data, imagemfinal->data, video.width * video.height * 3);
 		std::string textCurrent = "Numero de Resistencias Atuais: " + std::to_string(currentResistorCount);
 		int fontFace = cv::FONT_HERSHEY_TRIPLEX;
@@ -284,10 +332,10 @@ int main(void)
 		int thicknesse = 1;
 		cv::Point textOrgTotal(10, 80);
 		cv::putText(frame, textTotal, textOrgTotal, fontFacee, fontScalee, cv::Scalar(0, 0, 255), thicknesse, 8);
-		cv::imshow("VC - VIDEO", frame);
+		cv::imshow("VC - VIDEO", frame);*/
 
-		// cv::Mat grayMat = IVC_to_Mat1Channel(cenas2);
-		// cv::imshow("VC - VIDEO", grayMat);
+		cv::Mat grayMat = IVC_to_Mat1Channel(wow);
+		cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
 	}

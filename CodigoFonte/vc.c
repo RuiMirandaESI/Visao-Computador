@@ -2937,45 +2937,56 @@ int vc_binary_blob_info_trabalho(IVC *src, OVC *blobs, int nblobs)
 	return 1;
 }
 
-void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2) {
-    if (src1->width != src2->width || src1->height != src2->height) {
-        printf("ERROR -> brancoparaoriginal_trabalho():\n\tImages size mismatch!\n");
-        return;
-    }
+void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2)
+{
+	if (src1->width != src2->width || src1->height != src2->height)
+	{
+		printf("ERROR -> brancoparaoriginal_trabalho():\n\tImages size mismatch!\n");
+		return;
+	}
 
-    if (src1->channels != 1 || src2->channels != 3 || dst->channels != 3) {
-        printf("ERROR -> brancoparaoriginal_trabalho():\n\tChannel number mismatch!\n");
-        return;
-    }
+	if (src1->channels != 1 || src2->channels != 3 || dst->channels != 3)
+	{
+		printf("ERROR -> brancoparaoriginal_trabalho():\n\tChannel number mismatch!\n");
+		return;
+	}
 
-    int start = 217;
-    int end = src1->width - 217;
+	int start = 217;
+	int end = src1->width - 217;
 
-    for (int y = 0; y < src1->height; y++) {
-        for (int x = 0; x < src1->width; x++) {
-            int posSrc1 = y * src1->bytesperline + x; // Position in the binary image
-            int posSrc2 = y * src2->bytesperline + 3 * x; // Position in the 3-channel image
+	for (int y = 0; y < src1->height; y++)
+	{
+		for (int x = 0; x < src1->width; x++)
+		{
+			int posSrc1 = y * src1->bytesperline + x;	  // Position in the binary image
+			int posSrc2 = y * src2->bytesperline + 3 * x; // Position in the 3-channel image
 
-            if (x >= start && x < end) {
-                if (src1->data[posSrc1] == 255) {
-                    // Set dst pixels to white if src1's corresponding pixel is 255 within specified range
-                    dst->data[posSrc2] = 255;
-                    dst->data[posSrc2 + 1] = 255;
-                    dst->data[posSrc2 + 2] = 255;
-                } else {
-                    // Copy pixel from src2 to dst within specified range
-                    dst->data[posSrc2] = src2->data[posSrc2];
-                    dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
-                    dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
-                }
-            } else {
-                // Copy pixel from src2 to dst outside specified range
-                dst->data[posSrc2] = src2->data[posSrc2];
-                dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
-                dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
-            }
-        }
-    }
+			if (x >= start && x < end)
+			{
+				if (src1->data[posSrc1] == 255)
+				{
+					// Set dst pixels to white if src1's corresponding pixel is 255 within specified range
+					dst->data[posSrc2] = 255;
+					dst->data[posSrc2 + 1] = 255;
+					dst->data[posSrc2 + 2] = 255;
+				}
+				else
+				{
+					// Copy pixel from src2 to dst within specified range
+					dst->data[posSrc2] = src2->data[posSrc2];
+					dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
+					dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
+				}
+			}
+			else
+			{
+				// Copy pixel from src2 to dst outside specified range
+				dst->data[posSrc2] = src2->data[posSrc2];
+				dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
+				dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
+			}
+		}
+	}
 }
 
 int vc_hsv_segmentation_trabalho_completo(IVC *src, IVC *dst)
@@ -3026,7 +3037,6 @@ int vc_hsv_segmentation_trabalho_completo(IVC *src, IVC *dst)
 
 	return 1; // Success
 }
-
 
 int vc_hsv_segmentation_resistencia_corpo(IVC *src, IVC *dst)
 {
@@ -3271,4 +3281,60 @@ int vc_hsv_segmentation_resistencias(IVC *src, IVC *dst)
 	}
 
 	return 1; // Success
+}
+
+void lookForWhite(IVC *src, int yc, int *widths)
+{
+	unsigned char *data = (unsigned char *)src->data;
+	int width = src->width;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int x;
+	long int pos;
+
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return;
+
+	if (yc < 0 || yc >= src->height) // Ensure yc is within bounds
+		return;
+
+	int state = 0; // 0: looking for first white, 1: looking for transition to black, 2: looking for next white after black
+	int count = 0;
+
+	for (x = 0; x < width; x++)
+	{
+		pos = yc * bytesperline + x * channels;
+
+		if (state == 0)
+		{
+			if (data[pos] == 255)
+			{
+				if (count < 3)
+				{
+					widths[count++] = x + 4;
+				}
+				
+				state = 1;
+			}
+		}
+		else if (state == 1)
+		{
+			if (data[pos] == 0)
+			{
+				state = 2;
+			}
+		}
+		else if (state == 2)
+		{
+			if (data[pos] == 255)
+			{
+				if (count < 3)
+				{
+					widths[count++] = x + 4;
+				}
+				
+				state = 1;
+			}
+		}
+	}
 }
