@@ -146,6 +146,9 @@ int main(void)
 	int nblobs2;
 	OVC *blobs2;
 
+	long resistencias[6] = {0, 0, 0, 0, 0, 0};
+	int resistorIndex = 0;
+
 	/*OVC *arrayVerde[6] = {NULL}, *arrayPreto[6] = {NULL}, *arrayVermelho[6] = {NULL}, *arrayAzul[6] = {NULL}, *arrayCastanho[6] = {NULL}, *arrayResistencia[6] = {NULL}, *arrayLaranja[6] = {NULL};
 	OVC *blobSegmentation = NULL, *blobVerde = NULL, *blobPreto = NULL, *blobVermelho = NULL, *blobAzul = NULL, *blobCastanho = NULL, *blobCoresJuntas = NULL, *blobLaranja = NULL;
 	*/
@@ -289,6 +292,7 @@ int main(void)
 						memcpy(wow->data, cenasMat2.data, video.width * video.height);
 
 						int widths[3] = {0, 0, 0};
+						int cores[3] = {0, 0, 0};
 
 						lookForWhite(wow, blobs[i].yc, widths);
 
@@ -319,39 +323,131 @@ int main(void)
 
 							vc_hsv_segmentation(image, image15, 6, 12, 68, 78, 80, 92);
 
-							if (comparePixelsAtPosition(wow, image10, blobs[i].yc, widths[j]) == 1)
+							if (comparePixelsAtPosition(wow, image10, blobs[i].yc, widths[j]))
 							{
+
 								printf("Position %d: Color is Green\n", j + 1);
+								if (j == 0)
+								{
+									cores[0] = 5;
+								}
+								if (j == 1)
+								{
+									cores[1] = 5;
+								}
+								if (j == 2)
+								{
+									cores[2] = 100000;
+								}
 							}
-							if (comparePixelsAtPosition(wow, image11, blobs[i].yc, widths[j]) == 1)
+							if (comparePixelsAtPosition(wow, image11, blobs[i].yc, widths[j]))
 							{
+								if (j == 0)
+								{
+									cores[0] = 6;
+								}
+								if (j == 1)
+								{
+									cores[1] = 6;
+								}
+								if (j == 2)
+								{
+									cores[2] = 1000000;
+								}
+
 								printf("Position %d: Color is Blue\n", j + 1);
 							}
-							if (comparePixelsAtPosition(wow, image26, blobs[i].yc, widths[j]) == 1)
+							if (comparePixelsAtPosition(wow, image26, blobs[i].yc, widths[j]))
 							{
+
+								if (j == 0)
+								{
+									cores[0] = 2;
+								}
+								if (j == 1)
+								{
+									cores[1] = 2;
+								}
+								if (j == 2)
+								{
+									cores[2] = 100;
+								}
 								printf("Position %d: Color is Red\n", j + 1);
 							}
-							if (comparePixelsAtPosition(wow, image13, blobs[i].yc, widths[j]) == 1)
+							if (comparePixelsAtPosition(wow, image13, blobs[i].yc, widths[j]))
 							{
+
+								if (j == 0)
+								{
+									cores[0] = 1;
+								}
+								if (j == 1)
+								{
+									cores[1] = 1;
+								}
+								if (j == 2)
+								{
+									cores[2] = 10;
+								}
 								printf("Position %d: Color is Brown\n", j + 1);
 							}
-							if (comparePixelsAtPosition(wow, image14, blobs[i].yc, widths[j]) == 1)
+							if (comparePixelsAtPosition(wow, image14, blobs[i].yc, widths[j]))
 							{
+
+								if (j == 0)
+								{
+									cores[0] = 0;
+								}
+								if (j == 1)
+								{
+									cores[1] = 0;
+								}
+								if (j == 2)
+								{
+									cores[2] = 1;
+								}
 								printf("Position %d: Color is Black\n", j + 1);
 							}
-							if (comparePixelsAtPosition(wow, image15, blobs[i].yc, widths[j]) == 1)
+							if (comparePixelsAtPosition(wow, image15, blobs[i].yc, widths[j]))
 							{
+
+								if (j == 0)
+								{
+									cores[0] = 3;
+								}
+								if (j == 1)
+								{
+									cores[1] = 3;
+								}
+								if (j == 2)
+								{
+									cores[2] = 1000;
+								}
 								printf("Position %d: Color is Orange\n", j + 1);
 							}
 						}
+
 						printf("------------------------\n");
+
+						if (resistorIndex < 6)
+						{
+							int valor1 = cores[0];
+							int valor2 = cores[1];
+							long multiplicador = cores[2];
+
+							resistencias[resistorIndex] = (valor1 * 10 + valor2) * multiplicador;
+							printf("Resistance %d: %ld ohms\n", resistorIndex + 1, resistencias[resistorIndex]);
+
+
+							resistorIndex++;
+						}
 					}
 				}
 			}
 			free(blobs);
 		}
 
-		/*brancoparaoriginal_trabalho(imagemfinal, cenas2, imagesrc);
+		brancoparaoriginal_trabalho(imagemfinal, cenas2, imagesrc);
 		memcpy(frame.data, imagemfinal->data, video.width * video.height * 3);
 		std::string textCurrent = "Numero de Resistencias Atuais: " + std::to_string(currentResistorCount);
 		int fontFace = cv::FONT_HERSHEY_TRIPLEX;
@@ -365,10 +461,10 @@ int main(void)
 		int thicknesse = 1;
 		cv::Point textOrgTotal(10, 80);
 		cv::putText(frame, textTotal, textOrgTotal, fontFacee, fontScalee, cv::Scalar(0, 0, 255), thicknesse, 8);
-		cv::imshow("VC - VIDEO", frame);*/
+		cv::imshow("VC - VIDEO", frame);
 
-		cv::Mat grayMat = IVC_to_Mat1Channel(image12);
-		cv::imshow("VC - VIDEO", grayMat);
+		/*cv::Mat grayMat = IVC_to_Mat1Channel(wow);
+		cv::imshow("VC - VIDEO", grayMat);*/
 
 		key = cv::waitKey(1);
 	}
