@@ -111,13 +111,15 @@ int main(void)
 	IVC *image14 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image15 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image16 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image20 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image21 = vc_image_new(video.width, video.height, 1, 255);
 
 	// IVC *imageRGB = vc_image_new(image->width, image->height, 3, image->levels);
 	// IVC *dilatarimagem = vc_image_new(video.width, video.height, 3, 255);
 	// IVC *imagemFinal = vc_image_new(video.width, video.height, 3, 255);
 	// IVC *imagemFinalAux = vc_image_new(video.width, video.height, 3, 255);
 	IVC *imageVerde = vc_image_new(video.width, video.height, 1, 255);
-	IVC *imageAzul = vc_image_new(video.width, video.height, 1, 255);
+
 	// IVC *imagePreto = vc_image_new(video.width, video.height, 3, 255);
 	// IVC *imageVermelho = vc_image_new(video.width, video.height, 3, 255);
 	// IVC *imageCastanho = vc_image_new(video.width, video.height, 3, 255);
@@ -289,6 +291,8 @@ int main(void)
 
 						lookForWhite(wow, blobs[i].yc, widths);
 
+						printf("------------------------\n\n");
+
 						for (int j = 0; j < 3; j++)
 						{
 							printf("Width %d: %d\n", j + 1, widths[j]);
@@ -299,14 +303,40 @@ int main(void)
 
 							vc_hsv_segmentation_vermelho(image, image12);
 
+
 							vc_hsv_segmentation_castanho(image, image13);
+
 
 							vc_hsv_segmentation(image, image14, 35, 200, 3, 19, 15, 37);
 
 							vc_hsv_segmentation(image, image15, 6, 12, 68, 78, 80, 92);
 
-							
+							if (comparePixelsAtPosition(wow, image10, blobs[i].yc, widths[j]) == 1)
+							{
+								printf("Position %d: Color is Green\n", j + 1);
+							}
+							if (comparePixelsAtPosition(wow, image11, blobs[i].yc, widths[j]) == 1)
+							{
+								printf("Position %d: Color is Blue\n", j + 1);
+							}
+							if (comparePixelsAtPosition(wow, image12, blobs[i].yc, widths[j]) == 1)
+							{
+								printf("Position %d: Color is Red\n", j + 1);
+							}
+							if (comparePixelsAtPosition(wow, image13, blobs[i].yc, widths[j]) == 1)
+							{
+								printf("Position %d: Color is Brown\n", j + 1);
+							}
+							if (comparePixelsAtPosition(wow, image14, blobs[i].yc, widths[j]) == 1)
+							{
+								printf("Position %d: Color is Black\n", j + 1);
+							}
+							if (comparePixelsAtPosition(wow, image15, blobs[i].yc, widths[j]) == 1)
+							{
+								printf("Position %d: Color is Orange\n", j + 1);
+							}
 						}
+						printf("------------------------\n");
 					}
 				}
 			}
@@ -329,7 +359,7 @@ int main(void)
 		cv::putText(frame, textTotal, textOrgTotal, fontFacee, fontScalee, cv::Scalar(0, 0, 255), thicknesse, 8);
 		cv::imshow("VC - VIDEO", frame);*/
 
-		cv::Mat grayMat = IVC_to_Mat1Channel(wow);
+		cv::Mat grayMat = IVC_to_Mat1Channel(image12);
 		cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
@@ -357,6 +387,10 @@ int main(void)
 	vc_image_free(cenas2);
 	vc_image_free(imagesrc);
 	vc_image_free(imagemfinal);
+	vc_image_free(wow);
+	vc_image_free(imageVerde);
+	vc_image_free(image20);
+	vc_image_free(image21);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();

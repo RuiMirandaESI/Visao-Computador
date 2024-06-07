@@ -3171,7 +3171,7 @@ int vc_hsv_segmentation_castanho(IVC *src, IVC *dst)
 			v = (int)(((float)datasrc[pos_src + 2]) / 255.0f * 100.0f);
 
 			// Check if the pixel falls within the specified HSV range
-			if ((h >= 12 && h <= 28 && s >= 25 && s <= 44 && v >= 31 && v <= 49) || (h >= 11 && h <= 23 && s >= 42 && s <= 58 && v >= 41 && v <= 58))
+			if ((h >= 10 && h <= 30 && s >= 23 && s <= 46 && v >= 329 && v <= 51) || (h >= 9 && h <= 25 && s >= 39 && s <= 61 && v >= 38 && v <= 61))
 			{
 				datadst[pos_dst] = 255; // Pixel is within range, mark as white
 			}
@@ -3339,4 +3339,18 @@ void lookForWhite(IVC *src, int yc, int *widths)
 	}
 }
 
+int comparePixelsAtPosition(IVC *src1, IVC *src2, int yc, int width)
+{
+	unsigned char *data1 = (unsigned char *)src1->data;
+	unsigned char *data2 = (unsigned char *)src2->data;
+	int bytesperline = src1->bytesperline;
+	int channels = src1->channels;
 
+	long int pos = yc * bytesperline + width * channels;
+
+	if (data1[pos] == data2[pos])
+	{
+		return 1;
+	}
+	return 0;
+}
