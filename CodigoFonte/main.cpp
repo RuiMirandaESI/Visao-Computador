@@ -113,6 +113,7 @@ int main(void)
 	IVC *image16 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image20 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image21 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image26 = vc_image_new(video.width, video.height, 1, 255);
 
 	// IVC *imageRGB = vc_image_new(image->width, image->height, 3, image->levels);
 	// IVC *dilatarimagem = vc_image_new(video.width, video.height, 3, 255);
@@ -303,9 +304,16 @@ int main(void)
 
 							vc_hsv_segmentation_vermelho(image, image12);
 
+							cv::Mat image24 = IVC_to_Mat1Channel(image12);
+							cv::Mat image25;
+
+							int kernelSize3 = 4;
+							cv::Mat kernel3 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize3, kernelSize3));
+							cv::dilate(image24, image25, kernel3);
+
+							memcpy(image26->data, image25.data, video.width * video.height);
 
 							vc_hsv_segmentation_castanho(image, image13);
-
 
 							vc_hsv_segmentation(image, image14, 35, 200, 3, 19, 15, 37);
 
@@ -319,7 +327,7 @@ int main(void)
 							{
 								printf("Position %d: Color is Blue\n", j + 1);
 							}
-							if (comparePixelsAtPosition(wow, image12, blobs[i].yc, widths[j]) == 1)
+							if (comparePixelsAtPosition(wow, image26, blobs[i].yc, widths[j]) == 1)
 							{
 								printf("Position %d: Color is Red\n", j + 1);
 							}
