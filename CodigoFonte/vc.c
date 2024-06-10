@@ -660,7 +660,7 @@ int vc_hsv_segmentation(IVC *src, IVC *dst, int hmin, int hmax, int smin, int sm
 		return 0;
 
 	// Segmentation loop
-	for (y = 0; y < height; y++)
+	for (y = 50; y < 158; y++)
 	{
 		for (x = 0; x < width; x++)
 		{
@@ -2065,45 +2065,6 @@ int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th) // th = [0.001, 1.000]
 	return 1;
 }
 
-int vc_brg_to_gray(IVC *srcdst)
-{
-	unsigned char *data = (unsigned char *)srcdst->data;
-	int bytesperline = srcdst->width * srcdst->channels;
-	int channels = srcdst->channels;
-	int width = srcdst->width;
-	int height = srcdst->height;
-	int x, y;
-	long int pos;
-	float rf, gf, bf;
-
-	if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
-		return 0;
-	if (srcdst->channels != 3)
-		return 0;
-
-	for (y = 0; y < height; y++)
-	{
-		for (x = 0; x < width; x++)
-		{
-			pos = y * bytesperline + x * channels;
-
-			// Adjusted for BGR format
-			bf = (float)data[pos];
-			gf = (float)data[pos + 1];
-			rf = (float)data[pos + 2];
-
-			// Calculate grayscale value using the luminosity method
-			unsigned char gray = (unsigned char)((bf * 0.114) + (gf * 0.587) + (rf * 0.299));
-
-			// Update the BGR image in place to grayscale (all channels the same)
-			data[pos] = gray;	  // B channel
-			data[pos + 1] = gray; // G channel
-			data[pos + 2] = gray; // R channel
-		}
-	}
-	return 1;
-}
-
 int vc_bgr_to_rgb(IVC *srcdst)
 {
 	if (srcdst == NULL)
@@ -2130,53 +2091,6 @@ int vc_bgr_to_rgb(IVC *srcdst)
 		}
 	}
 	return 1;
-}
-
-int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, int vmin, int vmax)
-{
-	unsigned char *data = (unsigned char *)srcdst->data;
-	int bytesperline = srcdst->width * srcdst->channels;
-	int channels = srcdst->channels;
-	int width = srcdst->width;
-	int height = srcdst->height;
-	int x, y;
-	long int pos;
-	float h, s, v;
-
-	if (srcdst->width <= 0 || srcdst->height <= 0 || srcdst->data == NULL)
-		return 0;
-	if (srcdst->channels != 3)
-		return 0;
-
-	// Segmentation loop
-	for (y = 0; y < height; y++)
-	{
-		for (x = 0; x < width; x++)
-		{
-			pos = y * bytesperline + x * channels;
-
-			// Assuming HSV values are stored in srcdst and are normalized [0, 255]
-			h = (int)(((float)data[pos]) / 255.0f * 360.0f);
-			s = (int)(((float)data[pos + 1]) / 255.0f * 100.0f);
-			v = (int)(((float)data[pos + 2]) / 255.0f * 100.0f);
-
-			// Check if the pixel falls within the specified HSV range
-			if (h >= hmin && h <= hmax && s >= smin && s <= smax && v >= vmin && v <= vmax)
-			{
-				data[pos] = 255; // Set the pixel to white
-				data[pos + 1] = 255;
-				data[pos + 2] = 255;
-			}
-			else
-			{
-				data[pos] = 0; // Set the pixel to black
-				data[pos + 1] = 0;
-				data[pos + 2] = 0;
-			}
-		}
-	}
-
-	return 1; // Success
 }
 
 int vc_bgr_to_hsv(IVC *srcdst)
@@ -2254,218 +2168,206 @@ int vc_bgr_to_hsv(IVC *srcdst)
 	return 1;
 }
 
-OVC *vc_binary_blob_labelling2(IVC *srcdst, int *nlabels)
+void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2)
 {
-	unsigned char *data = (unsigned char *)srcdst->data;
-	int width = srcdst->width;
-	int height = srcdst->height;
-	int bytesperline = srcdst->bytesperline;
-	int channels = srcdst->channels;
-	int x, y, a, b;
-	long int i, size;
-	long int posX, posA, posB, posC, posD;
-	int labeltable[256] = {0};
-	int labelarea[256] = {0};
-	int label = 1; // Initial label.
-	int num, tmplabel;
-	OVC *blobs; // Pointer to an array of blobs (objects) to be returned from this function.
-
-	// Error checking
-	if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
-		return NULL;
-	if (channels != 1)
-		return NULL;
-
-	// The binary image should only contain 0 and 255 values
-	// Labels will be assigned in the range [1,254]
-	// This algorithm is thus limited to 254 labels
-	for (i = 0, size = bytesperline * height; i < size; i++)
+	if (src1->width != src2->width || src1->height != src2->height)
 	{
-		if (data[i] != 0)
-			data[i] = 255;
+		printf("ERROR -> brancoparaoriginal_trabalho():\n\tImages size mismatch!\n");
+		return;
 	}
 
-	// Clear the edges of the binary image
-	for (y = 0; y < height; y++)
+	if (src1->channels != 1 || src2->channels != 3 || dst->channels != 3)
 	{
-		data[y * bytesperline + 0 * channels] = 0;
-		data[y * bytesperline + (width - 1) * channels] = 0;
-	}
-	for (x = 0; x < width; x++)
-	{
-		data[0 * bytesperline + x * channels] = 0;
-		data[(height - 1) * bytesperline + x * channels] = 0;
+		printf("ERROR -> brancoparaoriginal_trabalho():\n\tChannel number mismatch!\n");
+		return;
 	}
 
-	// Perform labelling
-	for (y = 1; y < height - 1; y++)
+	int start = 150;
+	int end = src1->width - 150;
+
+	for (int y = 0; y < src1->height; y++)
 	{
-		for (x = 1; x < width - 1; x++)
+		for (int x = 0; x < src1->width; x++)
 		{
-			// Kernel:
-			// A B C
-			// D X
+			int posSrc1 = y * src1->bytesperline + x;	  // Position in the binary image
+			int posSrc2 = y * src2->bytesperline + 3 * x; // Position in the 3-channel image
 
-			posA = (y - 1) * bytesperline + (x - 1) * channels; // A
-			posB = (y - 1) * bytesperline + x * channels;		// B
-			posC = (y - 1) * bytesperline + (x + 1) * channels; // C
-			posD = y * bytesperline + (x - 1) * channels;		// D
-			posX = y * bytesperline + x * channels;				// X
-
-			// If the pixel is marked
-			if (data[posX] != 0)
+			if (x >= start && x < end)
 			{
-				num = 255;
-
-				// Check neighbors and find the smallest label
-				if (data[posA] != 0)
-					num = labeltable[data[posA]];
-				if ((data[posB] != 0) && (labeltable[data[posB]] < num))
-					num = labeltable[data[posB]];
-				if ((data[posC] != 0) && (labeltable[data[posC]] < num))
-					num = labeltable[data[posC]];
-				if ((data[posD] != 0) && (labeltable[data[posD]] < num))
-					num = labeltable[data[posD]];
-
-				if (num == 255) // All neighbors are zero, assign new label
+				if (src1->data[posSrc1] == 255)
 				{
-					data[posX] = label;
-					labeltable[label] = label;
-					label++;
+					// Set dst pixels to white if src1's corresponding pixel is 255 within specified range
+					dst->data[posSrc2] = 255;
+					dst->data[posSrc2 + 1] = 255;
+					dst->data[posSrc2 + 2] = 255;
 				}
 				else
 				{
-					data[posX] = num; // Assign the smallest label from neighbors
-
-					// Update label table
-					if (data[posA] != 0 && labeltable[data[posA]] != num)
-					{
-						tmplabel = labeltable[data[posA]];
-						for (a = 1; a < label; a++)
-						{
-							if (labeltable[a] == tmplabel)
-								labeltable[a] = num;
-						}
-					}
-					// Similar updates for B, C, and D
+					// Copy pixel from src2 to dst within specified range
+					dst->data[posSrc2] = src2->data[posSrc2];
+					dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
+					dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
 				}
+			}
+			else
+			{
+				// Copy pixel from src2 to dst outside specified range
+				dst->data[posSrc2] = src2->data[posSrc2];
+				dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
+				dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
+			}
+		}
+	}
+}
+
+int vc_hsv_segmentation_vermelho(IVC *src, IVC *dst)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	int byterperline_src = src->width * src->channels;
+	int channels_src = src->channels;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int bytesperline_dst = dst->width * dst->channels;
+	int channels_dst = dst->channels;
+	int width = src->width;
+	int height = src->height;
+	int x, y;
+	long int pos_src, pos_dst;
+	float h, s, v;
+
+	if (src->width <= 0 || src->height <= 0 || src->data == NULL)
+		return 0;
+	if (src->width != dst->width || src->height != dst->height)
+		return 0;
+	if (src->channels != 3 || dst->channels != 1)
+		return 0;
+
+	// Segmentation loop
+	for (y = 50; y < 158; y++)
+	{
+		for (x = 0; x < width; x++)
+		{
+			pos_src = y * byterperline_src + x * channels_src;
+			pos_dst = y * bytesperline_dst + x * channels_dst;
+
+			// Assuming HSV values are stored in src and are normalized [0, 255]
+			h = (int)(((float)datasrc[pos_src]) / 255.0f * 360.0f);
+			s = (int)(((float)datasrc[pos_src + 1]) / 255.0f * 100.0f);
+			v = (int)(((float)datasrc[pos_src + 2]) / 255.0f * 100.0f);
+
+			// Check if the pixel falls within the specified HSV range
+			if ((h >= 0 && h <= 11 && s >= 45 && s <= 69 && v >= 55 && v <= 89) || (h >= 354 && h <= 360 && s >= 45 && s <= 75 && v >= 55 && v <= 75))
+			{
+				datadst[pos_dst] = 255; // Pixel is within range, mark as white
+			}
+			else
+			{
+				datadst[pos_dst] = 0; // Pixel is outside range, mark as black
 			}
 		}
 	}
 
-	// Count the number of blobs
-	*nlabels = 0;
-	for (a = 1; a < label; a++)
+	return 1; // Success
+}
+
+int vc_hsv_segmentation_castanho(IVC *src, IVC *dst)
+{
+	unsigned char *datasrc = (unsigned char *)src->data;
+	int byterperline_src = src->width * src->channels;
+	int channels_src = src->channels;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int bytesperline_dst = dst->width * dst->channels;
+	int channels_dst = dst->channels;
+	int width = src->width;
+	int height = src->height;
+	int x, y;
+	long int pos_src, pos_dst;
+	float h, s, v;
+
+	if (src->width <= 0 || src->height <= 0 || src->data == NULL)
+		return 0;
+	if (src->width != dst->width || src->height != dst->height)
+		return 0;
+	if (src->channels != 3 || dst->channels != 1)
+		return 0;
+
+	// Segmentation loop
+	for (y = 50; y < 158; y++)
 	{
-		if (labeltable[a] != 0)
+		for (x = 0; x < width; x++)
 		{
-			labelarea[*nlabels] = labeltable[a]; // Organize label table
-			(*nlabels)++;						 // Count labels
+			pos_src = y * byterperline_src + x * channels_src;
+			pos_dst = y * bytesperline_dst + x * channels_dst;
+
+			// Assuming HSV values are stored in src and are normalized [0, 255]
+			h = (int)(((float)datasrc[pos_src]) / 255.0f * 360.0f);
+			s = (int)(((float)datasrc[pos_src + 1]) / 255.0f * 100.0f);
+			v = (int)(((float)datasrc[pos_src + 2]) / 255.0f * 100.0f);
+
+			// Check if the pixel falls within the specified HSV range
+			if ((h >= 10 && h <= 30 && s >= 23 && s <= 46 && v >= 329 && v <= 51) || (h >= 9 && h <= 25 && s >= 39 && s <= 61 && v >= 38 && v <= 61))
+			{
+				datadst[pos_dst] = 255; // Pixel is within range, mark as white
+			}
+			else
+			{
+				datadst[pos_dst] = 0; // Pixel is outside range, mark as black
+			}
 		}
 	}
 
-	// If no blobs
-	if (*nlabels == 0)
-		return NULL;
-
-	// Create blobs list
-	blobs = (OVC *)calloc((*nlabels), sizeof(OVC));
-	if (blobs != NULL)
-	{
-		for (a = 0; a < (*nlabels); a++)
-			blobs[a].label = labelarea[a];
-	}
-	else
-		return NULL;
-
-	return blobs;
+	return 1; // Success
 }
 
-int vc_gray_erode2(IVC *srcdst, int kernel)
+int vc_hsv_segmentation_final(IVC *src, IVC *dst)
 {
-	unsigned char *data = (unsigned char *)srcdst->data;
-	int width = srcdst->width;
-	int height = srcdst->height;
-	int bytesperline = srcdst->bytesperline;
-	int channels = srcdst->channels;
-	int offset = (kernel - 1) / 2;
-	int x, y, kx, ky;
-	long int pos, posk;
-	unsigned char min, value;
+	unsigned char *datasrc = (unsigned char *)src->data;
+	int byterperline_src = src->width * src->channels;
+	int channels_src = src->channels;
+	unsigned char *datadst = (unsigned char *)dst->data;
+	int bytesperline_dst = dst->width * dst->channels;
+	int channels_dst = dst->channels;
+	int width = src->width;
+	int height = src->height;
+	int x, y;
+	long int pos_src, pos_dst;
+	float h, s, v;
 
-	// Check for valid conditions
-	if ((srcdst->width <= 0) || (srcdst->height <= 0) || (srcdst->data == NULL))
+	if (src->width <= 0 || src->height <= 0 || src->data == NULL)
 		return 0;
-	if (channels != 1)
+	if (src->width != dst->width || src->height != dst->height)
+		return 0;
+	if (src->channels != 3 || dst->channels != 1)
 		return 0;
 
-	// Temporary buffer to hold the eroded image
-	unsigned char *temp = (unsigned char *)malloc(width * height * channels);
-	if (temp == NULL)
-		return 0; // Check if memory allocation failed
-
+	// Segmentation loop
 	for (y = 0; y < height; y++)
 	{
 		for (x = 0; x < width; x++)
 		{
-			pos = y * bytesperline + x * channels;
+			pos_src = y * byterperline_src + x * channels_src;
+			pos_dst = y * bytesperline_dst + x * channels_dst;
 
-			min = 255;
-			for (ky = -offset; ky <= offset; ky++)
+			// Assuming HSV values are stored in src and are normalized [0, 255]
+			h = (int)(((float)datasrc[pos_src]) / 255.0f * 360.0f);
+			s = (int)(((float)datasrc[pos_src + 1]) / 255.0f * 100.0f);
+			v = (int)(((float)datasrc[pos_src + 2]) / 255.0f * 100.0f);
+
+			// Check if the pixel falls within the specified HSV range
+			if ((h >= 12 && h <= 28 && s >= 25 && s <= 44 && v >= 31 && v <= 49) || (h >= 11 && h <= 23 && s >= 42 && s <= 58 && v >= 41 && v <= 58) || (h >= 0 && h <= 11 && s >= 45 && s <= 69 && v >= 55 && v <= 89) || (h >= 354 && h <= 360 && s >= 45 && s <= 75 && v >= 55 && v <= 75) || (h >= 79 && h <= 105 && s >= 28 && s <= 45 && v >= 35 && v <= 50) || (h >= 155 && h <= 200 && s >= 16 && s <= 40 && v >= 36 && v <= 52) || (h >= 35 && h <= 200 && s >= 3 && s <= 19 && v >= 15 && v <= 37) || (h >= 6 && h <= 12 && s >= 68 && s <= 78 && v >= 80 && v <= 92) || (h >= 29 && h <= 46 && s >= 31 && s <= 62 && v >= 54 && v <= 91) || (h >= 29 && h <= 38 && s >= 33 && s <= 46 && v >= 46 && v <= 56))
 			{
-				for (kx = -offset; kx <= offset; kx++)
-				{
-					if ((y + ky >= 0) && (y + ky < height) && (x + kx >= 0) && (x + kx < width))
-					{
-						posk = (y + ky) * bytesperline + (x + kx) * channels;
-						value = data[posk];
-
-						if (min > value)
-						{
-							min = value;
-						}
-					}
-				}
+				datadst[pos_dst] = 255; // Pixel is within range, mark as white
 			}
-
-			temp[pos] = min; // Use the temporary buffer to store the result
+			else
+			{
+				datadst[pos_dst] = 0; // Pixel is outside range, mark as black
+			}
 		}
 	}
 
-	// Copy the eroded image from the temporary buffer back to the original source
-	memcpy(data, temp, width * height * channels);
-	free(temp); // Free the allocated memory for the temporary buffer
-
-	return 1;
+	return 1; // Success
 }
 
-int vc_gray_to_rgb(IVC *src, IVC *dst)
-{
-	if (src->width <= 0 || src->height <= 0 || src->data == NULL)
-		return 0;
-	if (src->channels != 1)
-		return 0;
-
-	dst->width = src->width;
-	dst->height = src->height;
-	int y, x;
-	for (y = 0; y < src->height; y++)
-	{
-		for (x = 0; x < src->width; x++)
-		{
-			int src_pos = y * src->width + x;
-			int dst_pos = y * dst->width * dst->channels + x * dst->channels;
-
-			// Copia o valor do pixel grayscale para os três canais (R, G, B)
-			dst->data[dst_pos] = src->data[src_pos];	 // B channel
-			dst->data[dst_pos + 1] = src->data[src_pos]; // G channel
-			dst->data[dst_pos + 2] = src->data[src_pos]; // R channel
-		}
-	}
-	return 1;
-}
-
-int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax)
+int vc_hsv_segmentation_resistencias(IVC *src, IVC *dst)
 {
 	unsigned char *datasrc = (unsigned char *)src->data;
 	int byterperline_src = src->width * src->channels;
@@ -2489,7 +2391,7 @@ int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smi
 	// Segmentation loop
 	for (y = 0; y < height; y++)
 	{
-		for (x = 216; x < (width - 216); x++)
+		for (x = 0; x < width; x++)
 		{
 			pos_src = y * byterperline_src + x * channels_src;
 			pos_dst = y * bytesperline_dst + x * channels_dst;
@@ -2500,7 +2402,7 @@ int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smi
 			v = (int)(((float)datasrc[pos_src + 2]) / 255.0f * 100.0f);
 
 			// Check if the pixel falls within the specified HSV range
-			if (h >= hmin && h <= hmax && s >= smin && s <= smax && v >= vmin && v <= vmax)
+			if ((h >= 12 && h <= 28 && s >= 25 && s <= 44 && v >= 31 && v <= 49) || (h >= 11 && h <= 23 && s >= 42 && s <= 58 && v >= 41 && v <= 58) || (h >= 0 && h <= 11 && s >= 45 && s <= 69 && v >= 55 && v <= 89) || (h >= 354 && h <= 360 && s >= 45 && s <= 75 && v >= 55 && v <= 75) || (h >= 79 && h <= 105 && s >= 28 && s <= 45 && v >= 35 && v <= 50) || (h >= 155 && h <= 200 && s >= 16 && s <= 40 && v >= 36 && v <= 52) || (h >= 35 && h <= 200 && s >= 3 && s <= 19 && v >= 15 && v <= 37) || (h >= 6 && h <= 12 && s >= 68 && s <= 78 && v >= 80 && v <= 92))
 			{
 				datadst[pos_dst] = 255; // Pixel is within range, mark as white
 			}
@@ -2514,515 +2416,151 @@ int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smi
 	return 1; // Success
 }
 
-int vc_binary_erode_trabalho(IVC *src, IVC *dst, int kernel)
-{
-	unsigned char *datasrc = (unsigned char *)src->data;
-	unsigned char *datadst = (unsigned char *)dst->data;
-	int width = src->width;
-	int height = src->height;
-	int bytesperline = src->bytesperline;
-	int channels = src->channels;
-	int offset = (kernel - 1) / 2;
-	int x, y, kx, ky;
-	int ww;
-	long int pos, posk;
-	unsigned char threshold;
-
-	// Check for valid conditions
-	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
-		return 0;
-	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels))
-		return 0;
-	if (channels != 1)
-		return 0;
-
-	for (y = 0; y < height; y++)
-	{
-		for (x = 216; x < (width - 216); x++)
-		{
-			pos = y * bytesperline + x * channels;
-
-			ww = 0;
-			for (ky = -offset; ky <= offset; ky++)
-			{
-
-				for (kx = -offset; kx <= offset; kx++)
-				{
-					if ((y + ky >= 0) && (y + ky < height) && (x + kx >= 0) && (x + kx < width))
-					{
-						posk = (y + ky) * bytesperline + (x + kx) * channels;
-
-						if (datasrc[posk] == 0)
-						{
-							ww = 1;
-						}
-					}
-				}
-			}
-
-			if (ww == 1)
-				datadst[pos] = 0;
-			else
-				datadst[pos] = 255;
-		}
-	}
-	return 1;
-}
-
-int vc_binary_dilate_trabalho(IVC *src, IVC *dst, int kernel)
-{
-	unsigned char *datasrc = (unsigned char *)src->data;
-	unsigned char *datadst = (unsigned char *)dst->data;
-	int width = src->width;
-	int height = src->height;
-	int bytesperline = src->bytesperline;
-	int channels = src->channels;
-	int offset = (kernel - 1) / 2;
-	int x, y, kx, ky;
-	int soma;
-	long int pos, posk;
-	unsigned char threshold;
-
-	// Check for valid conditions
-	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
-		return 0;
-	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels))
-		return 0;
-	if (channels != 1)
-		return 0;
-
-	for (y = 0; y < height; y++)
-	{
-		for (x = 216; x < (width - 216); x++)
-		{
-			pos = y * bytesperline + x * channels;
-
-			soma = 0;
-			for (ky = -offset; ky <= offset; ky++)
-			{
-
-				for (kx = -offset; kx <= offset; kx++)
-				{
-					if ((y + ky >= 0) && (y + ky < height) && (x + kx >= 0) && (x + kx < width))
-					{
-						posk = (y + ky) * bytesperline + (x + kx) * channels;
-
-						soma += datasrc[posk];
-					}
-				}
-			}
-
-			if (soma >= 1)
-				datadst[pos] = 255;
-			else
-				datadst[pos] = 0;
-		}
-	}
-	return 1;
-}
-
-void combine_segmentations_trabalho(IVC *dst, IVC *src1, IVC *src2)
-{
-	if (src1->width != src2->width || src1->height != src2->height)
-	{
-		printf("ERROR -> combine_segmentations():\n\tImages size mismatch!\n");
-		return;
-	}
-
-	for (int y = 0; y < src1->height; y++)
-	{
-		for (int x = 216; x < ((src1->width) - 216); x++)
-		{
-			int pos = y * (src1->width) + x; // Assume imagens de destino são monocromáticas
-
-			// Se algum dos pixels nas imagens temporárias for branco, defina o correspondente em dst como branco
-			if (src1->data[pos] == 255 || src2->data[pos] == 255)
-			{
-				dst->data[pos] = 255;
-			}
-			else
-			{
-				dst->data[pos] = 0;
-			}
-		}
-	}
-}
-
-OVC *vc_binary_blob_labelling_trabalho(IVC *src, IVC *dst, int *nlabels)
-{
-	unsigned char *datasrc = (unsigned char *)src->data;
-	unsigned char *datadst = (unsigned char *)dst->data;
-	int width = src->width;
-	int height = src->height;
-	int bytesperline = src->bytesperline;
-	int channels = src->channels;
-	int x, y, a, b;
-	long int i, size;
-	long int posX, posA, posB, posC, posD;
-	int labeltable[256] = {0};
-	int labelarea[256] = {0};
-	int label = 1; // Etiqueta inicial.
-	int num, tmplabel;
-	OVC *blobs; // Apontador para array de blobs (objectos) que ser� retornado desta fun��o.
-
-	// Verifica��o de erros
-	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
-		return 0;
-	if ((src->width != dst->width) || (src->height != dst->height) || (src->channels != dst->channels))
-		return NULL;
-	if (channels != 1)
-		return NULL;
-
-	// Copia dados da imagem bin�ria para imagem grayscale
-	memcpy(datadst, datasrc, bytesperline * height);
-
-	// Todos os pix�is de plano de fundo devem obrigat�riamente ter valor 0
-	// Todos os pix�is de primeiro plano devem obrigat�riamente ter valor 255
-	// Ser�o atribu�das etiquetas no intervalo [1,254]
-	// Este algoritmo est� assim limitado a 254 labels
-	for (i = 0, size = bytesperline * height; i < size; i++)
-	{
-		if (datadst[i] != 0)
-			datadst[i] = 255;
-	}
-
-	// Limpa os rebordos da imagem bin�ria
-	for (y = 0; y < height; y++)
-	{
-		datadst[y * bytesperline + 0 * channels] = 0;
-		datadst[y * bytesperline + (width - 1) * channels] = 0;
-	}
-	for (x = 216; x < (width - 216); x++)
-	{
-		datadst[0 * bytesperline + x * channels] = 0;
-		datadst[(height - 1) * bytesperline + x * channels] = 0;
-	}
-	label = 1;
-	// Efectua a etiquetagem
-	for (y = 1; y < height - 1; y++)
-	{
-		for (x = (1 + 216); x < (width - 1 - 216); x++)
-		{
-			// Kernel:
-			// A B C
-			// D X
-
-			posA = (y - 1) * bytesperline + (x - 1) * channels; // A
-			posB = (y - 1) * bytesperline + x * channels;		// B
-			posC = (y - 1) * bytesperline + (x + 1) * channels; // C
-			posD = y * bytesperline + (x - 1) * channels;		// D
-			posX = y * bytesperline + x * channels;				// X
-
-			// Se o pixel foi marcado
-			if (datadst[posX] != 0)
-			{
-				if ((datadst[posA] == 0) && (datadst[posB] == 0) && (datadst[posC] == 0) && (datadst[posD] == 0))
-				{
-					datadst[posX] = label;
-					labeltable[label] = label; // mais do que 256 labels. confições ais restritivas para aceitar uam label.
-					label++;
-				}
-				else
-				{
-					num = 255;
-
-					// Se A est� marcado
-					if (datadst[posA] != 0)
-						num = labeltable[datadst[posA]];
-					// Se B est� marcado, e � menor que a etiqueta "num"
-					if ((datadst[posB] != 0) && (labeltable[datadst[posB]] < num))
-						num = labeltable[datadst[posB]];
-					// Se C est� marcado, e � menor que a etiqueta "num"
-					if ((datadst[posC] != 0) && (labeltable[datadst[posC]] < num))
-						num = labeltable[datadst[posC]];
-					// Se D est� marcado, e � menor que a etiqueta "num"
-					if ((datadst[posD] != 0) && (labeltable[datadst[posD]] < num))
-						num = labeltable[datadst[posD]];
-
-					// Atribui a etiqueta ao pixel
-					datadst[posX] = num;
-					labeltable[num] = num;
-
-					// Actualiza a tabela de etiquetas
-					if (datadst[posA] != 0)
-					{
-						if (labeltable[datadst[posA]] != num)
-						{
-							for (tmplabel = labeltable[datadst[posA]], a = 1; a < label; a++)
-							{
-								if (labeltable[a] == tmplabel)
-								{
-									labeltable[a] = num;
-								}
-							}
-						}
-					}
-					if (datadst[posB] != 0)
-					{
-						if (labeltable[datadst[posB]] != num)
-						{
-							for (tmplabel = labeltable[datadst[posB]], a = 1; a < label; a++)
-							{
-								if (labeltable[a] == tmplabel)
-								{
-									labeltable[a] = num;
-								}
-							}
-						}
-					}
-					if (datadst[posC] != 0)
-					{
-						if (labeltable[datadst[posC]] != num)
-						{
-							for (tmplabel = labeltable[datadst[posC]], a = 1; a < label; a++)
-							{
-								if (labeltable[a] == tmplabel)
-								{
-									labeltable[a] = num;
-								}
-							}
-						}
-					}
-					if (datadst[posD] != 0)
-					{
-						if (labeltable[datadst[posD]] != num)
-						{
-							for (tmplabel = labeltable[datadst[posD]], a = 1; a < label; a++)
-							{
-								if (labeltable[a] == tmplabel)
-								{
-									labeltable[a] = num;
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-
-	// Volta a etiquetar a imagem
-	for (y = 1; y < height - 1; y++)
-	{
-		for (x = (1 + 216); x < (width - 1 - 216); x++)
-		{
-			posX = y * bytesperline + x * channels; // X
-
-			if (datadst[posX] != 0)
-			{
-				datadst[posX] = labeltable[datadst[posX]];
-			}
-		}
-	}
-
-	// printf("\nMax Label = %d\n", label);
-
-	// Contagem do n�mero de blobs
-	// Passo 1: Eliminar, da tabela, etiquetas repetidas
-	for (a = 1; a < label - 1; a++)
-	{
-		for (b = a + 1; b < label; b++)
-		{
-			if (labeltable[a] == labeltable[b])
-				labeltable[b] = 0;
-		}
-	}
-	// Passo 2: Conta etiquetas e organiza a tabela de etiquetas, para que n�o hajam valores vazios (zero) entre etiquetas
-	*nlabels = 0;
-	for (a = 1; a < label; a++)
-	{
-		if (labeltable[a] != 0)
-		{
-			labeltable[*nlabels] = labeltable[a]; // Organiza tabela de etiquetas
-			(*nlabels)++;						  // Conta etiquetas
-		}
-	}
-
-	// Se n�o h� blobs
-	if (*nlabels == 0)
-		return NULL;
-
-	// Cria lista de blobs (objectos) e preenche a etiqueta
-	blobs = (OVC *)calloc((*nlabels), sizeof(OVC));
-	if (blobs != NULL)
-	{
-		for (a = 0; a < (*nlabels); a++)
-			blobs[a].label = labeltable[a];
-	}
-	else
-		return NULL;
-
-	return blobs;
-}
-
-int vc_binary_blob_info_trabalho(IVC *src, OVC *blobs, int nblobs)
+void lookForWhite(IVC *src, int yc, int *widths)
 {
 	unsigned char *data = (unsigned char *)src->data;
 	int width = src->width;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	int x;
+	long int pos;
+
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return;
+
+	if (yc < 0 || yc >= src->height) // Ensure yc is within bounds
+		return;
+
+	int state = 0; // 0: looking for first white, 1: looking for transition to black, 2: looking for next white after black
+	int count = 0;
+
+	for (x = 0; x < width; x++)
+	{
+		pos = yc * bytesperline + x * channels;
+
+		if (state == 0)
+		{
+			if (data[pos] == 255)
+			{
+				if (count < 3)
+				{
+					widths[count++] = x + 4;
+				}
+
+				state = 1;
+			}
+		}
+		else if (state == 1)
+		{
+			if (data[pos] == 0)
+			{
+				state = 2;
+			}
+		}
+		else if (state == 2)
+		{
+			if (data[pos] == 255)
+			{
+				if (count < 3)
+				{
+					widths[count++] = x + 4;
+				}
+
+				state = 1;
+			}
+		}
+	}
+}
+
+int comparePixelsAtPosition(IVC *src1, IVC *src2, int yc, int width)
+{
+	unsigned char *data1 = (unsigned char *)src1->data;
+	unsigned char *data2 = (unsigned char *)src2->data;
+	int bytesperline = src1->bytesperline;
+	int channels = src1->channels;
+
+	long int pos = yc * bytesperline + width * channels;
+
+	if (data1[pos] == data2[pos])
+	{
+		return 1;
+	}
+	return 0;
+}
+
+int vc_bgr_to_hsv2(IVC *src, IVC *dst)
+{
+	unsigned char *data_src = (unsigned char *)src->data;
+	unsigned char *data_dst = (unsigned char *)dst->data;
+	int width = src->width;
 	int height = src->height;
 	int bytesperline = src->bytesperline;
 	int channels = src->channels;
-	int x, y, i;
-	long int pos;
-	int xmin, ymin, xmax, ymax;
-	long int sumx, sumy;
+	float r, g, b, saturation, hue, value;
+	int i, size;
+	int pos_src, pos_dst;
+	float rgb_max;
+	float rgb_min;
 
-	// Verifica��o de erros
 	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
 		return 0;
-	if (channels != 1)
+	if (channels != 3 || dst->channels != 3)
 		return 0;
 
-	// Conta �rea de cada blob
-	for (i = 0; i < nblobs; i++)
+	size = width * height * channels;
+
+	for (i = 0; i < size; i += channels)
 	{
-		xmin = width - 1;
-		ymin = height - 1;
-		xmax = 0;
-		ymax = 0;
+		pos_src = i;
+		pos_dst = i;
 
-		sumx = 0;
-		sumy = 0;
+		b = (float)data_src[pos_src];
+		g = (float)data_src[pos_src + 1];
+		r = (float)data_src[pos_src + 2];
 
-		blobs[i].area = 0;
+		rgb_max = fmaxf(r, fmaxf(g, b));
+		rgb_min = fminf(r, fminf(g, b));
 
-		for (y = 1; y < height - 1; y++)
+		value = rgb_max;
+
+		if (value == 0.0f)
 		{
-			for (x = (1 + 216); x < (width - 1 - 216); x++)
+			hue = 0.0f;
+			saturation = 0.0f;
+		}
+		else
+		{
+			saturation = ((rgb_max - rgb_min) / rgb_max) * 255.0f;
+
+			if (saturation == 0.0f)
 			{
-				pos = y * bytesperline + x * channels;
-
-				if (data[pos] == blobs[i].label)
+				hue = 0.0f;
+			}
+			else
+			{
+				if ((rgb_max == r) && (g >= b))
 				{
-					// �rea
-					blobs[i].area++;
-
-					// Centro de Gravidade
-					sumx += x;
-					sumy += y;
-
-					// Bounding Box
-					if (xmin > x)
-						xmin = x;
-					if (ymin > y)
-						ymin = y;
-					if (xmax < x)
-						xmax = x;
-					if (ymax < y)
-						ymax = y;
-
-					// Per�metro
-					// Se pelo menos um dos quatro vizinhos n�o pertence ao mesmo label, ent�o � um pixel de contorno
-					if ((data[pos - 1] != blobs[i].label) || (data[pos + 1] != blobs[i].label) || (data[pos - bytesperline] != blobs[i].label) || (data[pos + bytesperline] != blobs[i].label))
-					{
-						blobs[i].perimeter++;
-					}
+					hue = 60.0f * (g - b) / (rgb_max - rgb_min);
+				}
+				else if ((rgb_max == r) && (b > g))
+				{
+					hue = 360.0f + 60.0f * (g - b) / (rgb_max - rgb_min);
+				}
+				else if (rgb_max == g)
+				{
+					hue = 120.0f + 60.0f * (b - r) / (rgb_max - rgb_min);
+				}
+				else if (rgb_max == b)
+				{
+					hue = 240.0f + 60.0f * (r - g) / (rgb_max - rgb_min);
 				}
 			}
 		}
 
-		// Bounding Box
-		blobs[i].x = xmin;
-		blobs[i].y = ymin;
-		blobs[i].width = (xmax - xmin) + 1;
-		blobs[i].height = (ymax - ymin) + 1;
-
-		// Centro de Gravidade
-		// blobs[i].xc = (xmax - xmin) / 2;
-		// blobs[i].yc = (ymax - ymin) / 2;
-		blobs[i].xc = sumx / MY_MAX(blobs[i].area, 1);
-		blobs[i].yc = sumy / MY_MAX(blobs[i].area, 1);
+		data_dst[pos_dst] = (unsigned char)(hue / 360.0f * 255.0f);
+		data_dst[pos_dst + 1] = (unsigned char)(saturation);
+		data_dst[pos_dst + 2] = (unsigned char)(value);
 	}
 
 	return 1;
-}
-
-void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2) {
-    if (src1->width != src2->width || src1->height != src2->height) {
-        printf("ERROR -> brancoparaoriginal_trabalho():\n\tImages size mismatch!\n");
-        return;
-    }
-
-    if (src1->channels != 1 || src2->channels != 3 || dst->channels != 3) {
-        printf("ERROR -> brancoparaoriginal_trabalho():\n\tChannel number mismatch!\n");
-        return;
-    }
-
-    int start = 217;
-    int end = src1->width - 217;
-
-    for (int y = 0; y < src1->height; y++) {
-        for (int x = 0; x < src1->width; x++) {
-            int posSrc1 = y * src1->bytesperline + x; // Position in the binary image
-            int posSrc2 = y * src2->bytesperline + 3 * x; // Position in the 3-channel image
-
-            if (x >= start && x < end) {
-                if (src1->data[posSrc1] == 255) {
-                    // Set dst pixels to white if src1's corresponding pixel is 255 within specified range
-                    dst->data[posSrc2] = 255;
-                    dst->data[posSrc2 + 1] = 255;
-                    dst->data[posSrc2 + 2] = 255;
-                } else {
-                    // Copy pixel from src2 to dst within specified range
-                    dst->data[posSrc2] = src2->data[posSrc2];
-                    dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
-                    dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
-                }
-            } else {
-                // Copy pixel from src2 to dst outside specified range
-                dst->data[posSrc2] = src2->data[posSrc2];
-                dst->data[posSrc2 + 1] = src2->data[posSrc2 + 1];
-                dst->data[posSrc2 + 2] = src2->data[posSrc2 + 2];
-            }
-        }
-    }
-}
-
-int vc_hsv_segmentation_trabalho_completo(IVC *src, IVC *dst)
-{
-	unsigned char *datasrc = (unsigned char *)src->data;
-	int byterperline_src = src->width * src->channels;
-	int channels_src = src->channels;
-	unsigned char *datadst = (unsigned char *)dst->data;
-	int bytesperline_dst = dst->width * dst->channels;
-	int channels_dst = dst->channels;
-	int width = src->width;
-	int height = src->height;
-	int x, y;
-	long int pos_src, pos_dst;
-	float h, s, v;
-
-	if (src->width <= 0 || src->height <= 0 || src->data == NULL)
-		return 0;
-	if (src->width != dst->width || src->height != dst->height)
-		return 0;
-	if (src->channels != 3 || dst->channels != 1)
-		return 0;
-
-	// Segmentation loop
-	for (y = 0; y < height; y++)
-	{
-		for (x = 216; x < (width - 216); x++)
-		{
-			pos_src = y * byterperline_src + x * channels_src;
-			pos_dst = y * bytesperline_dst + x * channels_dst;
-
-			// Assuming HSV values are stored in src and are normalized [0, 255]
-			h = (int)(((float)datasrc[pos_src]) / 255.0f * 360.0f);
-			s = (int)(((float)datasrc[pos_src + 1]) / 255.0f * 100.0f);
-			v = (int)(((float)datasrc[pos_src + 2]) / 255.0f * 100.0f);
-
-			// Check if the pixel falls within the specified HSV range
-			if ((h >= 30 && h <= 80 && s >= 30 && s <= 100 && v >= 30 && v <= 100) || (h >= 0 && h <= 360 && s >= 0 && s <= 40 && v >= 0 && v <= 40) || (h >= 0 && h <= 15 && s >= 50 && s <= 100 && v >= 50 && v <= 100) || (h >= 340 && h <= 360 && s >= 50 && s <= 100 && v >= 50 && v <= 100) || (h >= 100 && h <= 270 && s >= 30 && s <= 100 && v >= 30 && v <= 100) || (h >= 0 && h <= 30 && s >= 30 && s <= 60 && v >= 30 && v <= 60))
-			{
-				datadst[pos_dst] = 255; // Pixel is within range, mark as white
-			}
-			else
-			{
-				datadst[pos_dst] = 0; // Pixel is outside range, mark as black
-			}
-		}
-	}
-
-	return 1; // Success
 }

@@ -88,27 +88,37 @@ int main(void)
 
 	cv::Mat frame;
 
-	IVC *srcimage = vc_image_new(video.width, video.height, 3, 255);
-	IVC *srcimage2 = vc_image_new(video.width, video.height, 3, 255);
-	/*IVC *image = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image2 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image4 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image5 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image6 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image7 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image8 = vc_image_new(video.width, video.height, 1, 255);*/
-	IVC *image9 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image10 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image11 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image12 = vc_image_new(video.width, video.height, 3, 255);
-	/*IVC *image13 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image14 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image15 = vc_image_new(video.width, video.height, 1, 255);*/
-	IVC *image16 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *imagesrc = vc_image_new(video.width, video.height, 3, 255);
+	IVC *image_resistances_segmentation = vc_image_new(video.width, video.height, 1, 255);
+	IVC *resistances_segmentation_dilate = vc_image_new(video.width, video.height, 1, 255);
+	IVC *resistances_labelled = vc_image_new(video.width, video.height, 1, 255);
+	IVC *imagesrc2 = vc_image_new(video.width, video.height, 3, 255);
+	IVC *final_image = vc_image_new(video.width, video.height, 3, 255);
+	IVC *green_segmentation = vc_image_new(video.width, video.height, 1, 255);
+	IVC *resistance_bands_dilate = vc_image_new(video.width, video.height, 1, 255);
+	IVC *blue_segmentation = vc_image_new(video.width, video.height, 1, 255);
+	IVC *red_segmentation = vc_image_new(video.width, video.height, 1, 255);
+	IVC *brown_segmentation = vc_image_new(video.width, video.height, 1, 255);
+	IVC *black_segmentation = vc_image_new(video.width, video.height, 1, 255);
+	IVC *orange_segmentation = vc_image_new(video.width, video.height, 1, 255);
+	IVC *red_segmentation_dilate = vc_image_new(video.width, video.height, 1, 255);
+	IVC *resistance_bands = vc_image_new(video.width, video.height, 1, 255);
+
+	int nblobs, i;
+	OVC *blobs;
+
+	long resistencias[6] = {0, 0, 0, 0, 0, 0};
+	int resistorIndex = 0;
+
+	int totalResistorCount = 0;
+
+	cv::Mat Mat_resistances_segmentation_dilate;
+	cv::Mat Mat2;
+	cv::Mat mat_red_segmentation_dilate;
 
 	while (key != 'q')
 	{
+		int currentResistorCount = 0;
 		/* Leitura de uma frame do v�deo */
 		capture.read(frame);
 
@@ -119,137 +129,192 @@ int main(void)
 		/* N�mero da frame a processar */
 		video.nframe = (int)capture.get(cv::CAP_PROP_POS_FRAMES);
 
-		/* Exemplo de inser��o texto na frame */
-		/*
-		str = std::string("RESOLUCAO: ").append(std::to_string(video.width)).append("x").append(std::to_string(video.height));
-		cv::putText(frame, str, cv::Point(20, 25), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
-		cv::putText(frame, str, cv::Point(20, 25), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
-		str = std::string("TOTAL DE FRAMES: ").append(std::to_string(video.ntotalframes));
-		cv::putText(frame, str, cv::Point(20, 50), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
-		cv::putText(frame, str, cv::Point(20, 50), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
-		str = std::string("FRAME RATE: ").append(std::to_string(video.fps));
-		cv::putText(frame, str, cv::Point(20, 75), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
-		cv::putText(frame, str, cv::Point(20, 75), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);
-		str = std::string("N. DA FRAME: ").append(std::to_string(video.nframe));
-		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 0, 0), 2);
-		cv::putText(frame, str, cv::Point(20, 100), cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(255, 255, 255), 1);*/
+		memcpy(imagesrc2->data, frame.data, video.width * video.height * 3);
 
-		// Faça o seu código aqui...
-		/*
-		// Cria uma nova imagem IVC
-		IVC image = vc_image_new(video.width, video.height, 3, 255);
-		// Copia dados de imagem da estrutura cv::Mat para uma estrutura IVC
-		memcpy(image->data, frame.data, video.width video.height * 3);
-		// Executa uma função da nossa biblioteca vc
-		vc_rgb_get_green(image);
-		// Copia dados de imagem da estrutura IVC para uma estrutura cv::Mat
-		memcpy(frame.data, image->data, video.width * video.height * 3);
-		// Liberta a memória da imagem IVC que havia sido criada
-		vc_image_free(image);
-		*/
-		// +++++++++++++
+		vc_bgr_to_hsv2(imagesrc2, imagesrc);
 
-		memcpy(srcimage->data, frame.data, video.width * video.height * 3);
-		memcpy(srcimage2->data, frame.data, video.width * video.height * 3);
+		vc_hsv_segmentation_final(imagesrc, image_resistances_segmentation);
 
-		if ((video.nframe < 696 && !(video.nframe >= 110 && video.nframe <= 125) && !(video.nframe >= 455 && video.nframe <= 490)))
+		cv::Mat Mat_resistances_segmentation = IVC_to_Mat1Channel(image_resistances_segmentation);
+
+		int kernelSize = 7;
+		cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize, kernelSize));
+		cv::dilate(Mat_resistances_segmentation, Mat_resistances_segmentation_dilate, kernel);
+
+		memcpy(resistances_segmentation_dilate->data, Mat_resistances_segmentation_dilate.data, video.width * video.height);
+
+		blobs = vc_binary_blob_labelling(resistances_segmentation_dilate, resistances_labelled, &nblobs);
+		if (blobs != NULL)
 		{
-
-			vc_bgr_to_hsv(srcimage);
-			/*vc_hsv_segmentation_trabalho(srcimage, image, 30, 80, 30, 100, 30, 100);
-			vc_hsv_segmentation_trabalho(srcimage, image2, 0, 360, 0, 40, 0, 40);	 // preto
-			vc_hsv_segmentation_trabalho(srcimage, image3, 0, 15, 50, 100, 50, 100); // vermelho
-			vc_hsv_segmentation_trabalho(srcimage, image4, 340, 360, 50, 100, 50, 100);
-			vc_hsv_segmentation_trabalho(srcimage, image5, 100, 270, 30, 100, 30, 100); // verde e azul
-			vc_hsv_segmentation_trabalho(srcimage, image13, 0, 30, 30, 60, 30, 60);		// castanho
-			combine_segmentations_trabalho(image6, image2, image);
-			combine_segmentations_trabalho(image7, image3, image6);
-			combine_segmentations_trabalho(image8, image4, image7);
-			combine_segmentations_trabalho(image14, image13, image8);
-			combine_segmentations_trabalho(image9, image5, image14);*/
-			vc_hsv_segmentation_trabalho_completo(srcimage, image9);
-			// vc_binary_erode_trabalho(image9, image10, 6);
-
-			vc_binary_dilate_trabalho(image9, image16, 7);
-			// vc_binary_dilate_trabalho(image15, image10, 6);
-			vc_binary_erode_trabalho(image16, image10, 7);
-
-			int nblobs, i;
-			OVC *blobs;
-			blobs = vc_binary_blob_labelling_trabalho(image10, image11, &nblobs);
-			if (blobs != NULL)
+			vc_binary_blob_info(resistances_labelled, blobs, nblobs);
+			for (i = 0; i < nblobs; i++)
 			{
-
-				vc_binary_blob_info_trabalho(image11, blobs, nblobs);
-
-				printf("\nNumber of labels: %d\n", nblobs);
-
-				for (i = 0; i < nblobs; i++)
+				if (blobs[i].area >= 6900)
 				{
+					vc_draw_centerofgravity(resistances_labelled, &blobs[i], 1, 3);
+					vc_draw_boundingbox(resistances_labelled, &blobs[i], 1);
+					currentResistorCount++;
 
-					if (blobs[i].area > 5000)
+					if (blobs[i].yc >= 100 && blobs[i].yc < 108)
 					{
-						vc_draw_centerofgravity(image11, &blobs[i], 1, 3);
-						vc_draw_boundingbox(image11, &blobs[i], 1);
-						printf("\nArea of labels: %d\n", blobs[i].area);
+						totalResistorCount++;
+
+						vc_hsv_segmentation_resistencias(imagesrc, resistance_bands);
+
+						cv::Mat mat_resistance_bands = IVC_to_Mat1Channel(resistance_bands);
+
+						int kernelSize2 = 8;
+						cv::Mat kernel2 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize2, kernelSize2));
+						cv::dilate(mat_resistance_bands, Mat2, kernel2);
+
+						memcpy(resistance_bands_dilate->data, Mat2.data, video.width * video.height);
+
+						int widths[3] = {0, 0, 0};
+						int cores[3] = {0, 0, 0};
+
+						lookForWhite(resistance_bands_dilate, blobs[i].yc, widths);
+
+						// verde
+						vc_hsv_segmentation(imagesrc, green_segmentation, 79, 105, 28, 45, 35, 50);
+
+						// azul
+						vc_hsv_segmentation(imagesrc, blue_segmentation, 155, 200, 16, 40, 36, 52);
+
+						vc_hsv_segmentation_vermelho(imagesrc, red_segmentation);
+
+						cv::Mat mat_red_segmentation = IVC_to_Mat1Channel(red_segmentation);
+
+						int kernelSize3 = 4;
+						cv::Mat kernel3 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize3, kernelSize3));
+						cv::dilate(mat_red_segmentation, mat_red_segmentation_dilate, kernel3);
+
+						memcpy(red_segmentation_dilate->data, mat_red_segmentation_dilate.data, video.width * video.height);
+
+						vc_hsv_segmentation_castanho(imagesrc, brown_segmentation);
+
+						// preto
+						vc_hsv_segmentation(imagesrc, black_segmentation, 35, 200, 3, 19, 15, 37);
+
+						// laranja
+						vc_hsv_segmentation(imagesrc, orange_segmentation, 6, 12, 68, 78, 80, 92);
+
+						for (int j = 0; j < 3; j++)
+						{
+
+							// compara imagem das faixas todas com a imagem das faixas verde
+							if (comparePixelsAtPosition(resistance_bands_dilate, green_segmentation, blobs[i].yc, widths[j]))
+							{
+
+								cores[j] = (j == 2) ? 100000 : 5;
+							}
+
+							// compara imagem das faixas todas com a imagem das faixas azul
+							if (comparePixelsAtPosition(resistance_bands_dilate, blue_segmentation, blobs[i].yc, widths[j]))
+							{
+
+								cores[j] = (j == 2) ? 1000000 : 6;
+							}
+
+							// compara imagem das faixas todas com a imagem das faixas vermelho
+							if (comparePixelsAtPosition(resistance_bands_dilate, red_segmentation_dilate, blobs[i].yc, widths[j]))
+							{
+
+								cores[j] = (j == 2) ? 100 : 2;
+							}
+
+							// compara imagem das faixas todas com a imagem das faixas castanho
+							if (comparePixelsAtPosition(resistance_bands_dilate, brown_segmentation, blobs[i].yc, widths[j]))
+							{
+
+								cores[j] = (j == 2) ? 10 : 1;
+							}
+
+							// compara imagem das faixas todas com a imagem das faixas preto
+							if (comparePixelsAtPosition(resistance_bands_dilate, black_segmentation, blobs[i].yc, widths[j]))
+							{
+
+								cores[j] = (j == 2) ? 1 : 0;
+							}
+
+							// compara imagem das faixas todas com a imagem das faixas laranja
+							if (comparePixelsAtPosition(resistance_bands_dilate, orange_segmentation, blobs[i].yc, widths[j]))
+							{
+
+								cores[j] = (j == 2) ? 1000 : 3;
+							}
+						}
+
+						if (resistorIndex < 6)
+						{
+							int valor1 = cores[0];
+							int valor2 = cores[1];
+							long multiplicador = cores[2];
+
+							resistencias[resistorIndex] = (valor1 * 10 + valor2) * multiplicador;
+
+							resistorIndex++;
+						}
 					}
 				}
-				free(blobs);
 			}
-
-			brancoparaoriginal_trabalho(image12, image11, srcimage2);
-
-			printf("\nFPS atual: %d\n", video.nframe);
-
-			
-
-			// Para correr imagem final com 3 channels
-
-			// vc_gray_to_rgb(image11, image12);
-			// memcpy(frame.data, image12->data, video.width * video.height * 3);
-			// cv::imshow("VC - VIDEO", frame);
-
-			// Para correr imagem final com 1 channel
-
-			//cv::Mat grayMat = IVC_to_Mat1Channel(image10);
-			//cv::imshow("VC - VIDEO", grayMat);
-
-			memcpy(frame.data, image12->data, video.width * video.height * 3);
-			cv::imshow("VC - VIDEO", frame);
-
-			/* Sai da aplica��o, se o utilizador premir a tecla 'q' */
-			
+			free(blobs);
 		}
-		
+
+		brancoparaoriginal_trabalho(final_image, resistances_labelled, imagesrc2);
+		memcpy(frame.data, final_image->data, video.width * video.height * 3);
+		std::string textCurrent = "Numero de Resistencias Atuais: " + std::to_string(currentResistorCount);
+		int fontFace = cv::FONT_HERSHEY_TRIPLEX;
+		double fontScale = 0.5;
+		int thickness = 1;
+		cv::Point textOrgCurrent(10, 50);
+		cv::putText(frame, textCurrent, textOrgCurrent, fontFace, fontScale, cv::Scalar(0, 0, 0), thickness, 8);
+
+		std::string textTotal = "Numero total de Resistencias: " + std::to_string(totalResistorCount);
+		int fontFacee = cv::FONT_HERSHEY_TRIPLEX;
+		double fontScalee = 0.5;
+		int thicknesse = 1;
+		cv::Point textOrgTotal(10, 80);
+		cv::putText(frame, textTotal, textOrgTotal, fontFacee, fontScalee, cv::Scalar(0, 0, 255), thicknesse, 8);
+
+		int fontFaceee = cv::FONT_HERSHEY_TRIPLEX;
+		double fontScaleee = 0.5;
+		int thicknessee = 1;
+		cv::Point textOrgOhms(10, 110);
+
+		std::string textOhms;
+		if (resistorIndex > 0)
+		{
+			textOhms = "Ohms da Resistencia Atual: " + std::to_string(resistencias[resistorIndex - 1]) + " ohms";
+		}
 		else
 		{
-			memcpy(frame.data, srcimage2->data, video.width * video.height * 3);
-			cv::imshow("VC - VIDEO", frame);
-			
-			
+			textOhms = "Ohms da Resistencia Atual: --";
 		}
+		cv::putText(frame, textOhms, cv::Point(10, 110), cv::FONT_HERSHEY_TRIPLEX, 0.5, cv::Scalar(255, 0, 0), 1, 8);
+
+		cv::imshow("VC - VIDEO", frame);
+
+		// cv::Mat grayMat = IVC_to_Mat1Channel(orange_segmentation);
+		// cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
 	}
 
-	vc_image_free(srcimage);
-	vc_image_free(srcimage2);
-	/*vc_image_free(image);
-	vc_image_free(image2);
-	vc_image_free(image3);
-	vc_image_free(image4);
-	vc_image_free(image5);
-	vc_image_free(image6);
-	vc_image_free(image7);
-	vc_image_free(image8);*/
-	vc_image_free(image9);
-	vc_image_free(image10);
-	vc_image_free(image11);
-	vc_image_free(image12);
-	/*vc_image_free(image13);
-	vc_image_free(image14);
-	vc_image_free(image15);*/
-	vc_image_free(image16);
+	vc_image_free(imagesrc);
+	vc_image_free(imagesrc2);
+	vc_image_free(green_segmentation);
+	vc_image_free(blue_segmentation);
+	vc_image_free(red_segmentation);
+	vc_image_free(brown_segmentation);
+	vc_image_free(black_segmentation);
+	vc_image_free(orange_segmentation);
+	vc_image_free(red_segmentation_dilate);
+	vc_image_free(image_resistances_segmentation);
+	vc_image_free(resistances_segmentation_dilate);
+	vc_image_free(resistances_labelled);
+	vc_image_free(final_image);
+	vc_image_free(resistance_bands_dilate);
+	vc_image_free(resistance_bands);
 
 	/* Para o timer e exibe o tempo decorrido */
 	vc_timer();
