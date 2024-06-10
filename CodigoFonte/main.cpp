@@ -156,8 +156,7 @@ int main(void)
 				if (blobs[i].area >= 6900)
 				{
 					vc_draw_centerofgravity(cenas2, &blobs[i], 1, 3);
-					vc_draw_boundingbox(cenas2, &blobs[i], 1);
-					printf("a area e : %d\n",blobs[i].area);
+					vc_draw_boundingbox(cenas2, &blobs[i], 1);					
 					currentResistorCount++;
 
 					if (blobs[i].yc >= 100 && blobs[i].yc < 108)
@@ -246,12 +245,6 @@ int main(void)
 							resistorIndex++;
 						}
 					}
-					int textX = blobs[i].xc;
-					int textY = blobs[i].yc - 10; // Adjust to position above the bounding box
-
-					// Put the resistance value on the image
-					std::string resistanceText = std::to_string(resistencias[resistorIndex - 1]) + " ohms";
-					cv::putText(frame, resistanceText, cv::Point(textX, textY), cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(0, 0, 0), 1);
 				}
 			}
 			free(blobs);
@@ -278,7 +271,7 @@ int main(void)
 		int thicknessee = 1;
 		cv::Point textOrgOhms(10, 110);
 
-		std::string textOhms = "Ohms de Resistencia Atual: " + std::to_string(resistencias[resistorIndex - 1]);
+		std::string textOhms = "Ohms da Resistencia Atual: " + std::to_string(resistencias[resistorIndex - 1]);
 		cv::putText(frame, textOhms, cv::Point(10, 110), cv::FONT_HERSHEY_TRIPLEX, 0.5, cv::Scalar(255, 0, 0), 1, 8);
 
 		cv::imshow("VC - VIDEO", frame);

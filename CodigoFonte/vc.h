@@ -7,34 +7,31 @@
 //             [  DUARTE DUQUE - dduque@ipca.pt  ]
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
 #define VC_DEBUG
-
 
 #define MY_MAX(a, b) (a > b ? a : b)
 #define MY_MIN(a, b) (a < b ? a : b)
-
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                   ESTRUTURA DE UMA IMAGEM
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-
-typedef struct {
+typedef struct
+{
 	unsigned char *data;
 	int width, height;
-	int channels;			// Bin�rio/Cinzentos=1; RGB=3
-	int levels;				// Bin�rio=1; Cinzentos [1,255]; RGB [1,255]
-	int bytesperline;		// width * channels
+	int channels;	  // Bin�rio/Cinzentos=1; RGB=3
+	int levels;		  // Bin�rio=1; Cinzentos [1,255]; RGB [1,255]
+	int bytesperline; // width * channels
 } IVC;
-typedef struct {
-	int x, y, width, height;	// Caixa Delimitadora (Bounding Box)
-	int area;					// �rea
-	int xc, yc;					// Centro-de-massa
-	int perimeter;				// Per�metro
-	int label;					// Etiqueta
+typedef struct
+{
+	int x, y, width, height; // Caixa Delimitadora (Bounding Box)
+	int area;				 // �rea
+	int xc, yc;				 // Centro-de-massa
+	int perimeter;			 // Per�metro
+	int label;				 // Etiqueta
 } OVC;
-
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //                    PROT�TIPOS DE FUN��ES
@@ -56,7 +53,6 @@ int vc_rgb_get_green_gray(IVC *srcdst);
 int vc_rgb_get_blue_gray(IVC *srcdst);
 
 int vc_rgb_to_gray(IVC *src, IVC *dst);
-
 
 int vc_rgb_to_hsv(IVC *srcdst);
 int vc_hsv_segmentation(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
@@ -86,7 +82,7 @@ int vc_gray_close(IVC *src, IVC *dst, int kernel);
 void combine_segmentations2(IVC *dst, IVC *src1, IVC *src2);
 void brancoparaoriginal(IVC *dst, IVC *src1, IVC *src2);
 
-OVC* vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels);
+OVC *vc_binary_blob_labelling(IVC *src, IVC *dst, int *nlabels);
 int vc_binary_blob_info(IVC *src, OVC *blobs, int nblobs);
 
 int vc_coloring(IVC *src, IVC *dst, int nlabels);
@@ -99,38 +95,15 @@ int vc_gray_histogram_equalization(IVC *src, IVC *dst);
 
 int vc_gray_edge_prewitt(IVC *src, IVC *dst, float th);
 
-int vc_brg_to_gray(IVC *srcdst);
-
 int vc_bgr_to_rgb(IVC *srcdst);
-
-void segment_resistors(IVC *image);
-
-int vc_hsv_segmentation2(IVC *srcdst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
-int vc_bgr_to_hsv(IVC *srcdst);
-
-OVC* vc_binary_blob_labelling2(IVC *srcdst, int *nlabels);
-
-int vc_gray_erode2(IVC *srcdst, int kernel);
-
-int vc_gray_to_rgb(IVC *src, IVC *dst);
 
 /*
 
 			Para Trabalho Final
 
 */
-
-int vc_hsv_segmentation_trabalho(IVC *src, IVC *dst, int hmin, int hmax, int smin, int smax, int vmin, int vmax);
-int vc_binary_erode_trabalho(IVC *src, IVC *dst, int kernel);
-int vc_binary_dilate_trabalho(IVC *src, IVC *dst, int kernel);
-void combine_segmentations_trabalho(IVC *dst, IVC *src1, IVC *src2);
-OVC *vc_binary_blob_labelling_trabalho(IVC *src, IVC *dst, int *nlabels);
-int vc_binary_blob_info_trabalho(IVC *src, OVC *blobs, int nblobs);
+int vc_bgr_to_hsv(IVC *srcdst);
 void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2);
-int vc_hsv_segmentation_trabalho_completo(IVC *src, IVC *dst);
-
-
-
 int vc_hsv_segmentation_resistencia_corpo(IVC *src, IVC *dst);
 int vc_hsv_segmentation_vermelho(IVC *src, IVC *dst);
 int vc_hsv_segmentation_castanho(IVC *src, IVC *dst);
