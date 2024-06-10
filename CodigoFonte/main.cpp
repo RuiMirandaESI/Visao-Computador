@@ -130,10 +130,10 @@ int main(void)
 		/* N�mero da frame a processar */
 		video.nframe = (int)capture.get(cv::CAP_PROP_POS_FRAMES);
 
-		memcpy(imagesrc->data, frame.data, video.width * video.height * 3);
+		
 		memcpy(imagesrc2->data, frame.data, video.width * video.height * 3);
 
-		vc_bgr_to_hsv(imagesrc);
+		vc_bgr_to_hsv2(imagesrc2, imagesrc);
 
 		vc_hsv_segmentation_final(imagesrc, image8);
 
