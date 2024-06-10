@@ -88,21 +88,21 @@ int main(void)
 
 	cv::Mat frame;
 
-	IVC *image = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imageFinal = vc_image_new(video.width, video.height, 1, 255);
-	IVC *cenas = vc_image_new(video.width, video.height, 1, 255);
-	IVC *cenas2 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *imagesrc = vc_image_new(video.width, video.height, 3, 255);
-	IVC *imagemfinal = vc_image_new(video.width, video.height, 3, 255);
+	IVC *image8 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image9 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image10 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *wow = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image11 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *imagesrc2 = vc_image_new(video.width, video.height, 3, 255);
+	IVC *image11 = vc_image_new(video.width, video.height, 3, 255);
+	IVC *image1 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image12 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image2 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image3 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image4 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image5 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image6 = vc_image_new(video.width, video.height, 1, 255);
+	IVC *image7 = vc_image_new(video.width, video.height, 1, 255);
 	IVC *image13 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image14 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image15 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *image26 = vc_image_new(video.width, video.height, 1, 255);
-	IVC *imageVerde = vc_image_new(video.width, video.height, 1, 255);
 
 	int nblobs, i;
 	OVC *blobs;
@@ -130,104 +130,104 @@ int main(void)
 		/* N�mero da frame a processar */
 		video.nframe = (int)capture.get(cv::CAP_PROP_POS_FRAMES);
 
-		memcpy(image->data, frame.data, video.width * video.height * 3);
 		memcpy(imagesrc->data, frame.data, video.width * video.height * 3);
+		memcpy(imagesrc2->data, frame.data, video.width * video.height * 3);
 
-		vc_bgr_to_hsv(image);
+		vc_bgr_to_hsv(imagesrc);
 
-		vc_hsv_segmentation_final(image, imageFinal);
+		vc_hsv_segmentation_final(imagesrc, image8);
 
 		
 
-		cv::Mat imageFinalMat = IVC_to_Mat1Channel(imageFinal);
+		cv::Mat imageFinalMat = IVC_to_Mat1Channel(image8);
 
 		int kernelSize = 7;
 		cv::Mat kernel = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize, kernelSize));
 		cv::dilate(imageFinalMat, cenasMat, kernel);
 
-		memcpy(cenas->data, cenasMat.data, video.width * video.height);
+		memcpy(image9->data, cenasMat.data, video.width * video.height);
 
-		blobs = vc_binary_blob_labelling(cenas, cenas2, &nblobs);
+		blobs = vc_binary_blob_labelling(image9, image10, &nblobs);
 		if (blobs != NULL)
 		{
-			vc_binary_blob_info(cenas2, blobs, nblobs);
+			vc_binary_blob_info(image10, blobs, nblobs);
 			for (i = 0; i < nblobs; i++)
 			{
 				if (blobs[i].area >= 6900)
 				{
-					vc_draw_centerofgravity(cenas2, &blobs[i], 1, 3);
-					vc_draw_boundingbox(cenas2, &blobs[i], 1);					
+					vc_draw_centerofgravity(image10, &blobs[i], 1, 3);
+					vc_draw_boundingbox(image10, &blobs[i], 1);					
 					currentResistorCount++;
 
 					if (blobs[i].yc >= 100 && blobs[i].yc < 108)
 					{
 						totalResistorCount++;
 
-						vc_hsv_segmentation_resistencias(image, imageVerde);
+						vc_hsv_segmentation_resistencias(imagesrc, image13);
 
-						cv::Mat imageVerdecena = IVC_to_Mat1Channel(imageVerde);
+						cv::Mat imageVerdecena = IVC_to_Mat1Channel(image13);
 
 						int kernelSize2 = 8;
 						cv::Mat kernel2 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize2, kernelSize2));
 						cv::dilate(imageVerdecena, cenasMat2, kernel2);
 
-						memcpy(wow->data, cenasMat2.data, video.width * video.height);
+						memcpy(image12->data, cenasMat2.data, video.width * video.height);
 
 						int widths[3] = {0, 0, 0};
 						int cores[3] = {0, 0, 0};
 
-						lookForWhite(wow, blobs[i].yc, widths);
+						lookForWhite(image12, blobs[i].yc, widths);
 
 						for (int j = 0; j < 3; j++)
 						{
 
-							vc_hsv_segmentation(image, image10, 79, 105, 28, 45, 35, 50);
+							vc_hsv_segmentation(imagesrc, image1, 79, 105, 28, 45, 35, 50);
 
-							vc_hsv_segmentation(image, image11, 155, 200, 16, 40, 36, 52);
+							vc_hsv_segmentation(imagesrc, image2, 155, 200, 16, 40, 36, 52);
 
-							vc_hsv_segmentation_vermelho(image, image12);
+							vc_hsv_segmentation_vermelho(imagesrc, image3);
 
-							cv::Mat image24 = IVC_to_Mat1Channel(image12);
+							cv::Mat image24 = IVC_to_Mat1Channel(image3);
 
 							int kernelSize3 = 4;
 							cv::Mat kernel3 = cv::getStructuringElement(cv::MORPH_RECT, cv::Size(kernelSize3, kernelSize3));
 							cv::dilate(image24, image25, kernel3);
 
-							memcpy(image26->data, image25.data, video.width * video.height);
+							memcpy(image7->data, image25.data, video.width * video.height);
 
-							vc_hsv_segmentation_castanho(image, image13);
+							vc_hsv_segmentation_castanho(imagesrc, image4);
 
-							vc_hsv_segmentation(image, image14, 35, 200, 3, 19, 15, 37);
+							vc_hsv_segmentation(imagesrc, image5, 35, 200, 3, 19, 15, 37);
 
-							vc_hsv_segmentation(image, image15, 6, 12, 68, 78, 80, 92);
+							vc_hsv_segmentation(imagesrc, image6, 6, 12, 68, 78, 80, 92);
 
-							if (comparePixelsAtPosition(wow, image10, blobs[i].yc, widths[j]))
+							if (comparePixelsAtPosition(image12, image1, blobs[i].yc, widths[j]))
 							{
 
 								cores[j] = (j == 2) ? 100000 : 5;
 							}
 
-							if (comparePixelsAtPosition(wow, image11, blobs[i].yc, widths[j]))
+							if (comparePixelsAtPosition(image12, image2, blobs[i].yc, widths[j]))
 							{
 
 								cores[j] = (j == 2) ? 1000000 : 6;
 							}
-							if (comparePixelsAtPosition(wow, image26, blobs[i].yc, widths[j]))
+							if (comparePixelsAtPosition(image12, image7, blobs[i].yc, widths[j]))
 							{
 
 								cores[j] = (j == 2) ? 100 : 2;
 							}
-							if (comparePixelsAtPosition(wow, image13, blobs[i].yc, widths[j]))
+							if (comparePixelsAtPosition(image12, image4, blobs[i].yc, widths[j]))
 							{
 
 								cores[j] = (j == 2) ? 10 : 1;
 							}
-							if (comparePixelsAtPosition(wow, image14, blobs[i].yc, widths[j]))
+							if (comparePixelsAtPosition(image12, image5, blobs[i].yc, widths[j]))
 							{
 
 								cores[j] = (j == 2) ? 1 : 0;
 							}
-							if (comparePixelsAtPosition(wow, image15, blobs[i].yc, widths[j]))
+							if (comparePixelsAtPosition(image12, image6, blobs[i].yc, widths[j]))
 							{
 
 								cores[j] = (j == 2) ? 1000 : 3;
@@ -250,8 +250,8 @@ int main(void)
 			free(blobs);
 		}
 
-		brancoparaoriginal_trabalho(imagemfinal, cenas2, imagesrc);
-		memcpy(frame.data, imagemfinal->data, video.width * video.height * 3);
+		brancoparaoriginal_trabalho(image11, image10, imagesrc2);
+		memcpy(frame.data, image11->data, video.width * video.height * 3);
 		std::string textCurrent = "Numero de Resistencias Atuais: " + std::to_string(currentResistorCount);
 		int fontFace = cv::FONT_HERSHEY_TRIPLEX;
 		double fontScale = 0.5;
@@ -276,27 +276,27 @@ int main(void)
 
 		cv::imshow("VC - VIDEO", frame);
 
-		//cv::Mat grayMat = IVC_to_Mat1Channel(image10);
+		//cv::Mat grayMat = IVC_to_Mat1Channel(image1);
 		//cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
 	}
 
-	vc_image_free(image);
+	vc_image_free(imagesrc);
+	vc_image_free(imagesrc2);
+	vc_image_free(image1);
+	vc_image_free(image2);
+	vc_image_free(image3);
+	vc_image_free(image4);
+	vc_image_free(image5);
+	vc_image_free(image6);
+	vc_image_free(image7);
+	vc_image_free(image8);
+	vc_image_free(image9);
 	vc_image_free(image10);
 	vc_image_free(image11);
 	vc_image_free(image12);
 	vc_image_free(image13);
-	vc_image_free(image14);
-	vc_image_free(image15);
-	vc_image_free(image26);
-	vc_image_free(imageFinal);
-	vc_image_free(cenas);
-	vc_image_free(cenas2);
-	vc_image_free(imagesrc);
-	vc_image_free(imagemfinal);
-	vc_image_free(wow);
-	vc_image_free(imageVerde);
 	
 	
 

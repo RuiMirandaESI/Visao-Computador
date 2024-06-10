@@ -2536,3 +2536,80 @@ int comparePixelsAtPosition(IVC *src1, IVC *src2, int yc, int width)
 	}
 	return 0;
 }
+
+int vc_bgr_to_hsv(IVC *src, IVC *dst)
+{
+	unsigned char *data_src = (unsigned char *)src->data;
+	unsigned char *data_dst = (unsigned char *)dst->data;
+	int width = src->width;
+	int height = src->height;
+	int bytesperline = src->bytesperline;
+	int channels = src->channels;
+	float r, g, b, saturation, hue, value;
+	int i, size;
+	int pos_src, pos_dst;
+	float rgb_max;
+	float rgb_min;
+
+	if ((src->width <= 0) || (src->height <= 0) || (src->data == NULL))
+		return 0;
+	if (channels != 3 || dst->channels != 3)
+		return 0;
+
+	size = width * height * channels;
+
+	for (i = 0; i < size; i += channels)
+	{
+		pos_src = i;
+		pos_dst = i;
+
+		b = (float)data_src[pos_src];
+		g = (float)data_src[pos_src + 1];
+		r = (float)data_src[pos_src + 2];
+
+		rgb_max = fmaxf(r, fmaxf(g, b));
+		rgb_min = fminf(r, fminf(g, b));
+
+		value = rgb_max;
+
+		if (value == 0.0f)
+		{
+			hue = 0.0f;
+			saturation = 0.0f;
+		}
+		else
+		{
+			saturation = ((rgb_max - rgb_min) / rgb_max) * 255.0f;
+
+			if (saturation == 0.0f)
+			{
+				hue = 0.0f;
+			}
+			else
+			{
+				if ((rgb_max == r) && (g >= b))
+				{
+					hue = 60.0f * (g - b) / (rgb_max - rgb_min);
+				}
+				else if ((rgb_max == r) && (b > g))
+				{
+					hue = 360.0f + 60.0f * (g - b) / (rgb_max - rgb_min);
+				}
+				else if (rgb_max == g)
+				{
+					hue = 120.0f + 60.0f * (b - r) / (rgb_max - rgb_min);
+				}
+				else if (rgb_max == b)
+				{
+					hue = 240.0f + 60.0f * (r - g) / (rgb_max - rgb_min);
+				}
+			}
+		}
+
+		data_dst[pos_dst] = (unsigned char)(hue / 360.0f * 255.0f);
+		data_dst[pos_dst + 1] = (unsigned char)(saturation);
+		data_dst[pos_dst + 2] = (unsigned char)(value);
+	}
+
+	return 1;
+}

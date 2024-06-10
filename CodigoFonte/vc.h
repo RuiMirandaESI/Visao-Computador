@@ -111,3 +111,4 @@ int vc_hsv_segmentation_final(IVC *src, IVC *dst);
 int vc_hsv_segmentation_resistencias(IVC *src, IVC *dst);
 void lookForWhite(IVC *src, int yc, int *widths);
 int comparePixelsAtPosition(IVC *src1, IVC *src2, int yc, int width);
+int vc_bgr_to_hsv(IVC *src, IVC *dst);
