@@ -102,9 +102,9 @@ int vc_bgr_to_rgb(IVC *srcdst);
 			Para Trabalho Final
 
 */
+
 int vc_bgr_to_hsv(IVC *srcdst);
 void brancoparaoriginal_trabalho(IVC *dst, IVC *src1, IVC *src2);
-int vc_hsv_segmentation_resistencia_corpo(IVC *src, IVC *dst);
 int vc_hsv_segmentation_vermelho(IVC *src, IVC *dst);
 int vc_hsv_segmentation_castanho(IVC *src, IVC *dst);
 int vc_hsv_segmentation_final(IVC *src, IVC *dst);
