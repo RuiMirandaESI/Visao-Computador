@@ -281,13 +281,21 @@ int main(void)
 		int thicknessee = 1;
 		cv::Point textOrgOhms(10, 110);
 
-		std::string textOhms = "Ohms da Resistencia Atual: " + std::to_string(resistencias[resistorIndex - 1]);
+		std::string textOhms;
+		if (resistorIndex > 0)
+		{
+			textOhms = "Ohms da Resistencia Atual: " + std::to_string(resistencias[resistorIndex - 1]) + " ohms";
+		}
+		else
+		{
+			textOhms = "Ohms da Resistencia Atual: --";
+		}
 		cv::putText(frame, textOhms, cv::Point(10, 110), cv::FONT_HERSHEY_TRIPLEX, 0.5, cv::Scalar(255, 0, 0), 1, 8);
 
 		cv::imshow("VC - VIDEO", frame);
 
-		//cv::Mat grayMat = IVC_to_Mat1Channel(orange_segmentation);
-		//cv::imshow("VC - VIDEO", grayMat);
+		// cv::Mat grayMat = IVC_to_Mat1Channel(orange_segmentation);
+		// cv::imshow("VC - VIDEO", grayMat);
 
 		key = cv::waitKey(1);
 	}
