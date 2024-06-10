@@ -2537,7 +2537,7 @@ int comparePixelsAtPosition(IVC *src1, IVC *src2, int yc, int width)
 	return 0;
 }
 
-int vc_bgr_to_hsv(IVC *src, IVC *dst)
+int vc_bgr_to_hsv2(IVC *src, IVC *dst)
 {
 	unsigned char *data_src = (unsigned char *)src->data;
 	unsigned char *data_dst = (unsigned char *)dst->data;
